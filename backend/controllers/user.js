@@ -1,8 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt    = require("jsonwebtoken");
-// const { noExtendLeft } = require("sequelize/types/lib/operators");
 const models = require("../models/");
-const multer = require('../middleware/multer');
+// const multer = require('../middleware/multer');
 
 exports.signup = (req, res) => {
     // récupération des informations entrées par l'utilisateur
