@@ -1,11 +1,14 @@
+
 const jwt = require('jsonwebtoken');
 
 module.exports = (req, res, next) => {
   try {
-    const token = req.headers.authorization.split(' ')[1];
+    const token = req.headers.authorization;
+
     const decodedToken = jwt.verify(token, "privateKey"); //vérifie le token de l'entête pour authentifier la requête
     const userId = decodedToken.userId;
-    if (req.headers.userid != userId) {
+
+    if (!userId) {
       throw 'veuillez vous authentifier...';
     } else {
       next();

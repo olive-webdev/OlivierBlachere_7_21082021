@@ -53,7 +53,7 @@ exports.login = (req, res) => {
     })
     .then((User) => { //si l'utilisateur est introuvable dans la base de données
         if(!User){
-            res.status(500).json({ 'error': "utilisateur introuvable veuillez vous inscrire" });
+            res.status(400).send("utilisateur introuvable");
         }
         else{
             bcrypt.compare(password, User.password) //comparaison des mots de passe
@@ -61,12 +61,12 @@ exports.login = (req, res) => {
                     if(result === true)
                         {res.status(200).json( //renvoie de l'ID utilisateur et du TOKEN
                             { userId: User.id, token: jwt.sign({userId: User.id}, "privateKey", { expiresIn: "9h"})});}
-                    else{res.status(400).json({'error': "mauvais mot de passe"})}
+                    else{res.status(400).send("mauvais mot de passe")}
                 })
                 .catch(() => res.status(400).json({ error: 'connexion impossible' }))
         }
         })
-    .catch(() => res.status(500).json({ 'error': "utilisateur introuvable" }));
+    .catch(() => res.status(400).json({ error: "utilisateur introuvable" }));
 };
 
 exports.getAllUsers = (req, res) => {

@@ -22,7 +22,7 @@
                   py-3
                 "
               >
-                <div class="me-auto">Nom : nom</div>
+                <div class="me-auto">Nom :  {{ utilisateur.nom }}</div>
                 <i class="bi bi-pencil-fill red"></i>
               </li>
               <li
@@ -34,7 +34,7 @@
                   py-3
                 "
               >
-                <div class="">Prénom : prénom</div>
+                <div class="">Prénom : {{ utilisateur.prenom }}</div>
                 <i class="bi bi-pencil-fill red"></i>
               </li>
               <li
@@ -46,7 +46,7 @@
                   py-3
                 "
               >
-                <div class="me-auto">Service : administration</div>
+                <div class="me-auto">Service : {{ utilisateur.service }}</div>
                 <i class="bi bi-pencil-fill red"></i>
               </li>
               <li
@@ -59,7 +59,7 @@
                 "
               >
                 <div class="me-auto">
-                  Adresse Mail : fdghgfdh
+                  Adresse Mail : {{ utilisateur.email }}
                 </div>
                 <i class="bi bi-pencil-fill red"></i>
               </li>
@@ -72,7 +72,19 @@
                   py-3
                 "
               >
-                <div class="me-auto">Photo de profil</div>
+                <div class="me-auto">Photo de profil : {{ utilisateur.Ppicture }}</div>
+                <i class="bi bi-pencil-fill red"></i>
+              </li>
+              <li
+                class="
+                  list-group-item
+                  d-flex
+                  justify-content-between
+                  align-items-center
+                  py-3
+                "
+              >
+                <div class="me-auto">Compte créé le : {{ utilisateur.creation }}</div>
                 <i class="bi bi-pencil-fill red"></i>
               </li>
               <li
@@ -100,26 +112,30 @@
 <script>
 // @ is an alias to /src
 import Menu from "@/components/Menu.vue";
-
+import { ref } from '@vue/reactivity';
+const axios = require('axios').default;
 export default {
   name: "Profil",
   components: {
     Menu,
   },
   setup() {
-    const userProfil = function(){      
-      fetch(
-        "http://localhost:3000/users/12")
-        .then((res) => {res.json()
-            .then(function (user) {console.log(user);})
-        ;})
+    let utilisateur = ref({});
+    const getUserProfil = () => {
+      const token = localStorage.getItem('userToken');
+      const user = localStorage.getItem('userId');     
+      axios.get("http://localhost:3000/users/"+user , {headers: {Authorization: token}})
+        .then((res) => {utilisateur.value = {admin: res.data.admin, id: res.data.id, nom: res.data.surname, prenom: res.data.name,
+         service: res.data.service, email: res.data.email, photo: res.data.Ppicture, creation: res.data.createdAt}})
+      
         .catch((json) => console.log(json));
     };
-    return {userProfil};
+    return {getUserProfil, utilisateur};
   },
   beforeMount(){
-    this.userProfil()
+    this.getUserProfil()
   },
+
 };
 </script>
 
