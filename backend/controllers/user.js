@@ -91,6 +91,7 @@ exports.getOneUser = (req, res) => {
 exports.modifyUser = (req, res) => {
 
     const id = req.params.id;
+    console.log(id);
     const token = req.headers.authorization.split(' ')[1];
     const decodedToken = jwt.verify(token, "privateKey");
     const userId = decodedToken.userId;
@@ -106,18 +107,18 @@ exports.modifyUser = (req, res) => {
                     .then((User) => {
                         if(User === null){res.status(500).json({ 'error': "pas d'utilisateur trouvé" })}
                         else{
-                            const newEmail = req.body.email;
+                            const newEmail    = req.body.email;
                             const newPassword = req.body.password;
                             const newName     = req.body.name;
                             const newSurname  = req.body.surname;
                             const newService  = req.body.service;
                             const newPpicture = req.body.Ppicture;
             
-                            User.name = newName;
-                            User.surname = newSurname;
-                            User.service = newService;
+                            User.name     = newName;
+                            User.surname  = newSurname;
+                            User.service  = newService;
                             User.Ppicture = newPpicture;
-                            User.email = newEmail;
+                            User.email    = newEmail;
                             bcrypt.hash(newPassword, 2, function(err, bcryptedPassword){
                                 User.password = bcryptedPassword;
                                 User.save();
