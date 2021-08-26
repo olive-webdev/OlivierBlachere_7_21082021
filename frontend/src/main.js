@@ -4,7 +4,7 @@ import router from "./router";
 import store from "./store";
 import "bootstrap";
 import { BIconPersonSquare, BIconJournalText, BIconTools, BIconPencilFill, BIconEmojiSmileFill, BIconImage,
-  BIconHandThumbsUpFill, BIconXCircle, BIconShieldLockFill, BIconCaretDownSquare,} from "bootstrap-icons-vue";
+  BIconHandThumbsUpFill, BIconXCircle, BIconShieldLockFill, BIconCaretDownSquare,BIconCheckSquare,} from "bootstrap-icons-vue";
 
 const app = createApp(App);
 app.component("BIconPersonSquare", BIconPersonSquare);
@@ -17,6 +17,10 @@ app.component("BIconHandThumbsUpFill", BIconHandThumbsUpFill);
 app.component("BIconXCircle", BIconXCircle);
 app.component("BIconShieldLockFill", BIconShieldLockFill);
 app.component("BIconCaretDownSquare", BIconCaretDownSquare);
+app.component("BIconCheckSquare", BIconCheckSquare);
+
+
+
 
 app
   .use(store)
