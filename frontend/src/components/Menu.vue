@@ -40,6 +40,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+a{
+  text-decoration: none;
+}
 a:hover {
     color: rgb(233, 68, 38);
   }

@@ -250,6 +250,7 @@ img{
   right : 1rem;
   top : 1rem;
   display: none;
+  cursor: pointer;
 }
 .edit{
   z-index: 10;
