@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt    = require("jsonwebtoken");
 const models = require("../models/");
-// const multer = require('../middleware/multer');
+const multer = require('../middleware/multer');
 
 exports.signup = (req, res) => {
     // récupération des informations entrées par l'utilisateur
@@ -31,8 +31,8 @@ exports.signup = (req, res) => {
                 .then((newUser) => res.status(201).json({
                     'message': "Utilisateur créé !",
                     'userId' : newUser.id,
-                    'nom'    : newUser.name,
-                    'prénom' : newUser.surname,
+                    'prénom' : newUser.name,
+                    'nom'    : newUser.surname,
                     'email'  : newUser.email,
                     'service': newUser.service,
                     'créé le': newUser.createdAt}))
@@ -107,19 +107,11 @@ exports.modifyUser = (req, res) => {
                     .then((User) => {
                         if(User === null){res.status(500).json({ 'error': "pas d'utilisateur trouvé" })}
                         else{
-                            const newEmail    = req.body.email;
-                            const newPassword = req.body.password;
-                            const newName     = req.body.name;
-                            const newSurname  = req.body.surname;
-                            const newService  = req.body.service;
-                            const newPpicture = req.body.Ppicture;
-            
-                            User.name     = newName;
-                            User.surname  = newSurname;
-                            User.service  = newService;
-                            User.Ppicture = newPpicture;
-                            User.email    = newEmail;
-                            bcrypt.hash(newPassword, 2, function(err, bcryptedPassword){
+                            User.name = req.body.name;
+                            User.surname = req.body.surname;
+                            User.service = req.body.service;
+                            User.email = req.body.email;
+                            bcrypt.hash(req.body.password, 2, function(err, bcryptedPassword){
                                 User.password = bcryptedPassword;
                                 User.save();
                             });
@@ -140,29 +132,116 @@ exports.modifyUser = (req, res) => {
         .then((User) => {
             if(User === null){res.status(500).json({ 'error': "pas d'utilisateur trouvé" })}
             else{
-                const newEmail = req.body.email;
-                const newPassword = req.body.password;
-                const newName     = req.body.name;
-                const newSurname  = req.body.surname;
-                const newService  = req.body.service;
-                const newPpicture = req.body.Ppicture;
-
-                User.name = newName;
-                User.surname = newSurname;
-                User.service = newService;
-                User.Ppicture = newPpicture;
-                User.email = newEmail;
-                bcrypt.hash(newPassword, 2, function(err, bcryptedPassword){
+                User.name = req.body.name;
+                User.surname = req.body.surname;
+                User.service = req.body.service;
+                User.email = req.body.email;
+                bcrypt.hash(req.body.password, 2, function(err, bcryptedPassword){
                     User.password = bcryptedPassword;
                     User.save();
                 });
                 res.status(200).json({ 'message': "données de l'utilisateur modifié"});
             }
         })
-        .catch(() => res.status(500).json({ 'error': "pas d'utilisateur trouvé" }));
+        .catch(() => res.status(500).json({ 'error': "impossible de mettre à jour" }));
     }
 };
 
+exports.modifyPhoto = (req, res) => {
+    const id = req.params.id;
+    console.log(id);
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedToken = jwt.verify(token, "privateKey");
+    const userId = decodedToken.userId;
+    if(userId != id){
+        models.User.findOne({
+            where: { id : userId }
+            })
+        .then((User) => {
+            if(User.admin === true){
+                models.User.findOne({
+                    where: { id: id }
+                    })
+                    .then((User) => {
+                        if(User === null){res.status(500).json({ 'error': "pas d'utilisateur trouvé" })}
+                        else{
+                            User.Ppicture = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+                            User.save()
+                            .then(()=>{res.status(200).json({ 'message': "données de l'utilisateur modifié par l'utilisateur"});})
+                            .catch(()=>{res.status(500).json({ 'error': "impossible de modifier la photo" })})
+                        }
+                    })
+                    .catch(() => res.status(500).json({ 'error': "pas d'utilisateur trouvé" }));
+            }
+            else{
+                res.status(500).json({ 'error': "vous devez être administrateur pour effectuer cette opération"});}
+        })
+        .catch(() => res.status(500).json({ 'error': "vous n'avez pas les droits pour effectuer cette opération"}))
+    }
+    else{
+        models.User.findOne({
+        where: { id: id }
+        })
+        .then((User) => {
+            if(User === null){res.status(500).json({ 'error': "pas d'utilisateur trouvé" })}
+            else{
+                User.Ppicture = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+                User.save()
+                .then(()=>{res.status(200).json({ 'message': "données de l'utilisateur modifié par l'utilisateur"});})
+                .catch(()=>{res.status(500).json({ 'error': "impossible de modifier la photo" })})
+            }
+        })
+        .catch(() => res.status(500).json({ 'error': "impossible de mettre à jour" }));
+    }
+};
+
+exports.deletePhoto = (req, res) => {
+    const id = req.params.id;
+    console.log(id);
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedToken = jwt.verify(token, "privateKey");
+    const userId = decodedToken.userId;
+    if(userId != id){
+        models.User.findOne({
+            where: { id : userId }
+            })
+        .then((User) => {
+            if(User.admin === true){
+                models.User.findOne({
+                    where: { id: id }
+                    })
+                    .then((User) => {
+                        if(User === null){res.status(500).json({ 'error': "pas d'utilisateur trouvé" })}
+                        else{
+                            User.Ppicture = null;
+                            User.save()
+                            .then(()=>{res.status(200).json({ 'message': "photo supprimée par l'administrateur"});})
+                            .catch(()=>{res.status(500).json({ 'error': "impossible de supprimer la photo" })})
+                        }
+                    })
+                    .catch(() => res.status(500).json({ 'error': "pas d'utilisateur trouvé" }));
+            }
+            else{
+                res.status(500).json({ 'error': "vous devez être administrateur pour effectuer cette opération"});}
+        })
+        .catch(() => res.status(500).json({ 'error': "vous n'avez pas les droits pour effectuer cette opération"}))
+    }
+    else{
+        models.User.findOne({
+        where: { id: id }
+        })
+        .then((User) => {
+            if(User === null){res.status(500).json({ 'error': "pas d'utilisateur trouvé" })}
+            else{
+                User.Ppicture = null;
+                User.save()
+                .then(()=>{res.status(200).json({ 'message': "photo supprimée par l'utilisateur"});})
+                .catch(()=>{res.status(500).json({ 'error': "impossible de modifier la photo" })})
+            }
+        })
+        .catch(() => res.status(500).json({ 'error': "impossible de supprimer" }));
+    }
+};
 exports.deleteUser = (req, res) => {
     const id = req.params.id;
     const token = req.headers.authorization.split(' ')[1];

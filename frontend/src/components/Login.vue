@@ -23,7 +23,7 @@
           </div>
           <div v-else id="signup" class="bg-white rounded-g px-5 shadow mt-5">
             <img src="@/assets/icon.svg" alt="" />
-            <form @submit.prevent="login">
+            <form @submit.prevent="signup">
                 <div class="mb-3">
                 <label for="surname" class="form-label red" >Nom</label >
                 <input type="text" class="form-control borderG" id="surname" aria-describedby="surnameHelp"
@@ -69,12 +69,13 @@ export default {
     setup(){
         let toggler = ref(true)
         const toggle = () => {
-            console.log(toggler)
             toggler.value = !toggler.value;
         }
         const router = useRouter();
         const email = ref("");
         const password = ref("");
+        const name  = ref("");
+        const surname = ref("");
         const login = function() {
         axios.post("http://localhost:3000/users/login", { email: email.value, password: password.value })
         .then((res) => {
@@ -86,12 +87,19 @@ export default {
           })
         .catch(() => {localStorage.removeItem('userId');
                       localStorage.removeItem('userToken')})
-    };
-    return {
-        login,
-        email, password,
-        toggle, toggler,
-    };
+        };
+        const signup = function() {
+          axios.post("http://localhost:3000/users/signup", { name: name.value, surname: surname.value, email: email.value, password: password.value })
+          .then((email, password) => { login(email, password); router.push("Profil"); })
+          .catch(() => {localStorage.removeItem('userId');
+                        localStorage.removeItem('userToken')})
+        };
+        return {
+            login, signup,
+            name, surname,
+            email, password,
+            toggle, toggler,
+        };
 }
 }
 </script>

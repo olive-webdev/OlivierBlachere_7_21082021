@@ -92,7 +92,7 @@ textarea:focus, input:focus {
 }
 .form-controlled {
   display                              : block;
-  width                                : calc(100% - 60px - 85px);
+  width                                : calc(100% - 60px - 115px);
   padding                              : 0.375rem 0.75rem;
   font-size                            : 1rem;
   font-weight                          : 400;
@@ -121,14 +121,7 @@ textarea:focus, input:focus {
   right                                : 1rem;
   top                                  : 1.2rem;
 }
-.smileyh {
-  right                                : 6.3rem;
-  top                                  : 1.2rem;
-}
-.image {
-  right                                : 9rem;
-  top                                  : 1.2rem;
-}
+
 .red {
   color                                : rgb(233, 68, 38);
 }

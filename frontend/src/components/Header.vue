@@ -3,7 +3,6 @@
       <router-link to="/">
         <img class="logo ms-3" src="../assets/icon-left-font-corrected.svg" alt="" />
       </router-link>
-
       <div class="d-flex flex-column align-items-center p-1 me-3">
         <div class="dropdown">
           <div class="d-flex" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
@@ -13,7 +12,6 @@
             </div>
             <img class="rounded-g borderG shadow" src="@/assets/defaultProfilPicture.jpeg" height="60" width="60" alt="" />
           </div>
-
           <div id="nav" class="p-0 my-0 rounded-g dropdown-menu dropdown-menu-end wime" aria-labelledby="dropdownMenuButton1">
             <router-link class="black" to="/">
               <div class=" d-flex dropdown-item justify-content-between align-items-center py-3 bckg rounded-g-top ">
