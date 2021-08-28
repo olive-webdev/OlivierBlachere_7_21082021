@@ -77,17 +77,17 @@ export default {
         const name  = ref("");
         const surname = ref("");
         const login = function() {
-        axios.post("http://localhost:3000/users/login", { email: email.value, password: password.value })
-        .then((res) => {
-          const token = res.data.token;
-          const userId = res.data.userId;
-          localStorage.setItem('userId', userId);
-          localStorage.setItem('userToken', token);
-          router.push("Profil");
-          })
-        .catch(() => {localStorage.removeItem('userId');
-                      localStorage.removeItem('userToken')})
-        };
+          axios.post("http://localhost:3000/users/login", { email: email.value, password: password.value })
+          .then((res) => {
+            const token = res.data.token;
+            const userId = res.data.userId;
+            localStorage.setItem('userId', userId);
+            localStorage.setItem('userToken', token);
+            router.push("Profil");
+            })
+          .catch(() => {localStorage.removeItem('userId');
+                        localStorage.removeItem('userToken')})
+          };
         const signup = function() {
           axios.post("http://localhost:3000/users/signup", { name: name.value, surname: surname.value, email: email.value, password: password.value })
           .then((email, password) => { login(email, password); router.push("Profil"); })
@@ -100,7 +100,7 @@ export default {
             email, password,
             toggle, toggler,
         };
-}
+    }
 }
 </script>
 

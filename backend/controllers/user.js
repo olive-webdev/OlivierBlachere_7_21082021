@@ -279,15 +279,15 @@ exports.deleteUser = (req, res) => {
         .catch(() => res.status(500).json({ 'error': "vous n'avez pas les droits pour effectuer cette opération"}))}
 
     else{
-        models.Posting.destroy(
-            {where: {UserId : id}}
-        )
-        .then(() => {
+        // models.Posting.destroy(
+        //     {where: {UserId : id}}
+        // )
+        // .then(() => {
             models.User.destroy(
                 {where: { id : id }}
             )
-            .then(() => res.status(200).json({'message' : "utilisateur supprimé par l'utilisateur"}))
+            .then(() => res.status(200).json({'message' : "compte utilisateur supprimé par l'utilisateur"}))
             .catch((error) => res.status(500).json(error));
-        })
-        .catch(() => res.status(500).json({ 'error': "erreur à la suppression des messages" }));}
-};
+        // })
+        // .catch(() => res.status(500).json({ 'error': "erreur à la suppression des messages" }));}
+}};

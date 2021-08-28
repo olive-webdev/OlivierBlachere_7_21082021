@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container bg-light">
     <Header />
     <Login />
   </div>
@@ -15,6 +15,16 @@ export default {
   components:{
     Header,
     Login
+  },
+  methods:{
+    disconnect(){
+      this.$store.state.isConnected = false;
+      localStorage.removeItem("userId");
+      localStorage.removeItem("userToken");
+    }
+  },
+  mounted(){
+    this.disconnect()
   },
 };
 </script>

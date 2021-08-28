@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="bg-light container">
     <Header />
     <div class="container h d-flex bg-light px-4">
       <Menu />

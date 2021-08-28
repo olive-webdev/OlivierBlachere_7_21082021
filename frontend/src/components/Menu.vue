@@ -14,7 +14,7 @@
             <div class="me-auto ms-3 d-none d-lg-block">Profil</div>
           </div>
         </router-link>
-        <router-link class="black" to="/admin">
+        <router-link v-if="$store.state.admin" class="black" to="/admin">
           <div class=" d-flex justify-content-between align-items-center py-3 bckg " >
             <BIconShieldLockFill class="fs-2 ms-3" />
             <div class="me-auto ms-3 d-none d-lg-block">Administration</div>
@@ -35,10 +35,9 @@
 <script>
 export default {
   name: "Menu",
-};
+}
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 a{
   text-decoration: none;

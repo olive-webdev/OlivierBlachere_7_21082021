@@ -3,9 +3,9 @@ import App from "./App.vue";
 import router from "./router";
 import store from "./store";
 import "bootstrap";
-import { BIconPersonSquare, BIconJournalText, BIconTools, BIconPencilFill, BIconEmojiSmileFill, BIconImage,
-  BIconHandThumbsUpFill, BIconXCircle, BIconShieldLockFill, BIconCaretDownSquare,BIconCheckSquare,
-  BIconArrowRightSquare,BIconTrash,} from "bootstrap-icons-vue";
+import {BIconPersonSquare, BIconJournalText, BIconTools, BIconPencilFill, BIconEmojiSmileFill, BIconImage,
+        BIconHandThumbsUpFill, BIconXCircle, BIconShieldLockFill, BIconCaretDownSquare,BIconCheckSquare,
+        BIconArrowRightSquare,BIconTrash,} from "bootstrap-icons-vue";
 
 const app = createApp(App);
 app.component("BIconPersonSquare", BIconPersonSquare);
@@ -22,10 +22,4 @@ app.component("BIconCheckSquare", BIconCheckSquare);
 app.component("BIconArrowRightSquare", BIconArrowRightSquare);
 app.component("BIconTrash", BIconTrash);
 
-
-
-
-app
-  .use(store)
-  .use(router)
-  .mount("#app");
+app.use(store).use(router).mount("#app");
