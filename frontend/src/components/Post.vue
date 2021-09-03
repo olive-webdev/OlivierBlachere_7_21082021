@@ -1,7 +1,7 @@
 <template>
-  <div class="bg-white rounded-g d-flex pt-3 flex-column p-4 mb-4 shadow">
+  <div class="bg-white round d-flex pt-3 flex-column p-4 mb-4 shadow">
     <div class="d-flex justify-content-between">
-      <img class="rounded-g borderG" src="https://i.pravatar.cc/60" height="60" alt="" />
+      <img class="round borderG" src="" height="60" alt="" />
       <div class="me-auto ms-3 text-secondary">
         <h3 class="m-0 red">Prénom Nom</h3>
         <p class="text-start">Il y a 8 minutes</p>
@@ -9,7 +9,6 @@
 
       <div class="dropdown">
         <div class="" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-          <BIconCaretDownSquare class="red fs-4" />
         </div>
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton1">
           <li>
@@ -37,14 +36,11 @@
       </p>
       <div class="">
         <div class="">
-          <img class="w-100 rounded-g mb-3" src="http://lorempixel.com/700/639" alt="" />
+          <img class="w-100 round mb-3" src="http://lorempixel.com/700/639" alt="" />
         </div>
       </div>
     </div>
     <div class="d-flex justify-content-between text-secondary">
-      <p>
-        <BIconHandThumbsUpFill class="red fs-5 mb-2" />12</p>
-
       <a class="text-decoration-none text-secondary" data-bs-toggle="collapse" href="#collapseExample" role="button"
         aria-expanded="false" aria-controls="collapseExample">
         4 commentaires
@@ -53,29 +49,20 @@
     </div>
 
     <div class="collapse" id="collapseExample">
-      <Message />
-      <Message />
     </div>
     <div class="d-flex position-relative">
-      <img class="rounded-g-start border-right-0 borderG border-end-0" src="https://i.pravatar.cc/60?img=1" />
-      <input class=" form-controlled border-start-0 w-100 rounded-g-end position-relative ps-5 borderG " 
+      <img class="round-start border-right-0 borderG border-end-0" src="https://i.pravatar.cc/60?img=1" />
+      <input class=" form-controlled border-start-0 w-100 round-end position-relative ps-5 borderG " 
       type="text" placeholder="Écrivez un commentaire..." />
-      <BIconPencilFill class="position-absolute pen red fs-4" />
-      <BIconEmojiSmileFill class="position-absolute smiley red fs-4" />
     </div>
   </div>
 </template>
 
 <script>
-  import Message from "@/components/Message.vue";
 
   export default {
-    name: "Post",
-    props: {
-      msg: String,
-    },
+    name: "PostFeed",
     components: {
-      Message,
     },
   };
 </script>

@@ -1,48 +1,63 @@
-import { createRouter, createWebHistory } from "vue-router";
-// import Main from "../views/Main.vue";
+import { createRouter, createWebHistory } from 'vue-router'
+import Home from '../views/Home.vue'
 
 const routes = [
   {
-    path: "/",
-    name: "Main",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/Main.vue"),
+    path: '/',
+    name: 'Home',
+    component: Home,
+    meta:{
+      title: 'Accueil'
+    }
   },
   {
-    path: "/profil",
-    name: "Profil",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/Profil.vue"),
+    path: '/connexion',
+    name: 'Connexion',
+    meta:{
+      title: 'Connexion'
+    },
+    component: () => import('../views/Connexion.vue')
   },
   {
-    path: "/admin",
-    name: "Admin",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/Admin.vue"),
+    path: '/administration',
+    name: 'Administration',
+    meta:{
+      title: 'Administration'
+    },
+    component: () => import('../views/Administration.vue')
   },
   {
-    path: "/connex",
-    name: "Connex",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/Connex.vue"),
+    path: '/profil/:id',
+    name: 'Profil',
+    meta:{
+      title: 'Profil'
+    },
+    component: () => import('../views/Profil.vue')
   },
-];
+  {
+    path: '/postfeed',
+    name: 'PostFeed',
+    meta:{
+      title: "Fil d'actualité"
+    },
+    component: () => import('../views/PostFeed.vue')
+  },
+  {
+    path: '/:pathMatch(.*)',
+    name: 'NotFound',
+    meta:{
+      title: "page inexistante"
+    },
+    component: () => import('../views/NotFound.vue')
+  },
+]
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
-  routes,
-});
+  routes
+})
 
-export default router;
+router.afterEach((to) => {
+  document.title = to.meta.title
+})
+export default router

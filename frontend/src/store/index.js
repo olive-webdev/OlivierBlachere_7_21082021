@@ -1,43 +1,78 @@
 import { createStore } from 'vuex'
-
-const store = createStore({
-  state:{
-      admin   : false,
-      id      : Number,
-      nom     : "nom",
-      prenom  : "prénom",
-      service : "service",
-      email   : "email",
-      photo   : "",
-      creation:  "",
-      isConnected: true,
-  },
-  mutations: {
-    changeAdmin(state, value){
-      state.admin = value;
-    },
-    changeId(state, value){
-      state.id = value;
-    },
-    changeSurname(state, value){
-      state.nom = value;
-    },
-    changeName(state, value){
-      state.prenom = value;
-    },
-    changeService(state, value){
-      state.service = value;
-    },
-    changeEmail(state, value){
-      state.email = value;
-    },
-    changePhoto(state, value){
-      state.photo = value;
-    },
-    changeCreation(state, value){
-      state.creation = value;
-    },
-  }
+const axios = require('axios').default;
+const instance = axios.create({
+  baseURL: 'http://localhost:3000'
 })
 
-export default store;
+export default createStore({
+  state: {
+    status: '',
+    user: {
+      userId: '-1',
+      token: '',
+      name: '',
+      surname: '',
+      email: '',
+      service: null,
+      Ppicture: null,
+      admin: Boolean,
+      creation: null,
+      auth: true,
+    },
+  },
+  mutations: {
+    setStatus: function(state, status){state.status = status},
+    loginUser: function(state, user){state.user = user},
+    getUser: function(state, user){state.user = user, state.user.token = user.token, state.user.userId = user.id, state.user.Ppicture = user.Ppicture},
+    connected: function(state, userInfos){state.user.userId = userInfos.id, state.user.token = userInfos.token},
+    logout: function(state, value){state.user.userId = value},
+    modifyProfil: function(state, value){state.user = value},
+    changePhoto: function(state, userProfil){state.user.Ppicture = userProfil.Ppicture},
+  },
+  actions: {
+    signup: ({commit}, userInfos) =>  {
+      commit('setStatus', 'connecting...')
+      return new Promise((resolve, reject) => {
+        instance.post('/users/signup', {email: userInfos.email, surname: userInfos.surname, name: userInfos.name, password: userInfos.password})
+        .then(function(response){commit('setStatus', 'created');resolve(response)})
+        .catch(function(error){commit('setStatus', 'errorSignup');reject(error)})
+      })
+    },
+    login: ({commit}, userInfos) =>  {
+      commit('setStatus', 'connecting...')
+      return new Promise((resolve, reject) => {
+        instance.post('/users/login', {email: userInfos.email, password: userInfos.password})
+        .then(function(response)
+          {commit('setStatus', 'connected');
+          commit('loginUser', response.data);
+          localStorage.setItem('userId', response.data.userId);
+          localStorage.setItem('token', response.data.token);
+          resolve(response)})
+        .catch(function(error){commit('setStatus', 'errorLogin');reject(error)})
+      })
+    },
+    getUser: ({commit}, userInfos) => {
+      console.log(userInfos)
+      return new Promise((resolve, reject) => {
+        instance.get('/users/' + userInfos.id, { headers: { Authorization: 'bearer ' + userInfos.token } })
+        .then(function(response)
+          {commit('getUser', response.data);
+          commit('connected', userInfos); resolve(response)})
+        .catch(function(error){commit('setStatus', 'errorGetUser');reject(error)})
+      });
+    },
+    logout: ({commit}) => {
+      commit("logout", -1)
+    },
+    modifyProfil: ({commit}, userProfil) => {
+      commit('setStatus', 'modifying Profil...')
+      return new Promise((resolve, reject) => {
+        instance.put('/users/' + userProfil.id, {email: userProfil.email, surname: userProfil.surname, name: userProfil.name, service: userProfil.service, Ppicture: userProfil.photo, password: userProfil.password}, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
+        .then(function(response){commit('modifyProfil', userProfil);resolve(response)})
+        .catch(function(error){commit('setStatus', 'errorModifyingProfil');reject(error)})
+      })
+    },
+  },
+  modules: {
+  }
+})

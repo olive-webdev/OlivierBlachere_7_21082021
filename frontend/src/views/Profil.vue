@@ -1,47 +1,46 @@
 <template>
-  <div class="bg-light container">
-    <Header />
-    <div class="container h d-flex bg-light px-4">
-      <Menu />
-      <ProfilInfo />
+  <div class="container bg-light px-4">
+    <Header  />
+    <div class="row">
+      <div class="col-3 mt-3">
+        <Menu />
+      </div>
+      <div class="col-9 mt-3">
+        <InfoUser />
+      </div>
     </div>
   </div>
 </template>
-
 <script>
-// @ is an alias to /src
-import Menu from "@/components/Menu.vue";
-import Header from "@/components/Header.vue";
-import ProfilInfo from "@/components/ProfilInfo.vue"
+import Header from '../components/Header.vue';
+import Menu from '../components/Menu.vue';
+import InfoUser from '../components/InfoUser.vue';
+import { useRouter } from "vue-router";
 
 export default {
   name: "Profil",
-  components: {
-    Menu,
-    Header,
-    ProfilInfo
+  components: {Header, Menu, InfoUser},
+  data(){
+    return{
+      router: useRouter(),
+    }
   },
+
+   beforeMount: function(){
+    if(!this.$store.state.user.token && !localStorage.getItem('token')){
+      this.$router.push("/connexion")
+      console.log("utilisateur non connecté")
+    }
+    else if(!this.$store.state.user.token && localStorage.getItem('token')){
+      this.$store.dispatch('getUser', {
+      id: localStorage.getItem('userId'),
+      token: localStorage.getItem('token')})
+      .then(() => { console.log(this.$store.state.user) })
+      .catch()
+    }
+    else{
+      return;
+    }
+  }
 };
 </script>
-
-<style lang="scss">
-.h {
-  height: calc(100vh - 90px);
-}
-.inputfile {
-	opacity: 0;
-	position: absolute;
-	z-index: -1;
-}
-
-.inputfile:hover + label,
-.inputfile + label:hover {
-    color: rgb(233, 68, 38);
-}
-.rounded-g-top {
-  border-radius: 0.75rem 0.75rem 0 0;
-}
-.rounded-g-bottom {
-  border-radius: 0 0 0.75rem 0.75rem;
-}
-</style>

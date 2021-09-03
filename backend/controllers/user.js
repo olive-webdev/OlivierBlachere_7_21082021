@@ -9,7 +9,7 @@ exports.signup = (req, res) => {
     const password = req.body.password;
     const name     = req.body.name;
     const surname  = req.body.surname;
-    const service  = req.body.service;
+
 
     models.User.findOne({ //on cherche dans la base de données si l'utilisateur existe déjà
         attributes: ['email'],
@@ -27,14 +27,13 @@ exports.signup = (req, res) => {
         }
         else{ //création du compte dans la base de données
             bcrypt.hash(password, 2, function( err, bcryptedPassword ){
-                const newUser = models.User.create({ name: name, surname: surname, email: email, password: bcryptedPassword, service: service })
+                const newUser = models.User.create({ name: name, surname: surname, email: email, password: bcryptedPassword})
                 .then((newUser) => res.status(201).json({
                     'message': "Utilisateur créé !",
                     'userId' : newUser.id,
                     'prénom' : newUser.name,
                     'nom'    : newUser.surname,
                     'email'  : newUser.email,
-                    'service': newUser.service,
                     'créé le': newUser.createdAt}))
                 .catch(() => res.status(400).json({ 'error': 'erreur = utilisateur non créé' }))
             })
@@ -60,7 +59,8 @@ exports.login = (req, res) => {
                 .then(function(result){
                     if(result === true)
                         {res.status(200).json( //renvoie de l'ID utilisateur et du TOKEN
-                            { userId: User.id, token: jwt.sign({userId: User.id}, "privateKey", { expiresIn: "9h"})});}
+                            { userId: User.id, token: jwt.sign({userId: User.id}, "privateKey", { expiresIn: "9h"}),
+                             name: User.name, surname: User.surname, email: User.email, service: User.service, Ppicture: User.Ppicture, admin: User.admin, creation: User.createdAt});}
                     else{res.status(400).send("mauvais mot de passe")}
                 })
                 .catch(() => res.status(400).json({ error: 'connexion impossible' }))
@@ -89,7 +89,6 @@ exports.getOneUser = (req, res) => {
 };
 
 exports.modifyUser = (req, res) => {
-
     const id = req.params.id;
     console.log(id);
     const token = req.headers.authorization.split(' ')[1];
