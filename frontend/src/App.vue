@@ -24,7 +24,7 @@
   }
 }
 .round{
-    border-radius: .8rem;
+    border-radius: .6rem;
 }
 body::-webkit-scrollbar {
   display: none;
@@ -34,7 +34,7 @@ body::-webkit-scrollbar {
 }
 .btng{
   background-color: rgb(235, 204, 204);
-  border-radius: .8rem;
+  border-radius: .6rem;
   border: 1px solid rgb(233, 68, 38);
 }
 @import "~bootstrap/dist/css/bootstrap.css";

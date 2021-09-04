@@ -66,7 +66,7 @@ a:hover {
 }
 
 .round-top{
-    border-radius: .8rem .8rem 0 0;
+    border-radius: .6rem .6rem 0 0;
 }
 
 </style>

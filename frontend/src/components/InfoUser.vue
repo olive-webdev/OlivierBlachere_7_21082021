@@ -260,7 +260,7 @@ li{
 
 .btngw{
   background-color: none;
-  border-radius: .8rem;
+  border-radius: .6rem;
   border: 1px solid rgb(233, 68, 38);
   color: rgb(233, 68, 38);
 }

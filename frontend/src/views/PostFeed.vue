@@ -20,24 +20,28 @@
               Envoyer !<BIconArrowRightSquare class="fs-4 ms-2" /></div>
           </div>
           <div v-if="emoji" id="emoji">
-            <ul class="d-flex fs-3 mb-0 mt-2">
+            <ul class="d-flex fs-3 mb-0 mt-2 flex-wrap">
               <li @click="addEmoji(emojiList)" class="mx-1 pointer" v-for="emojiList in emojiLists" :key="emojiList">{{emojiList}}</li>
             </ul>
           </div>
+
           <div v-if="photo" id="photo">
             <input @change="addPhoto()" type="file" ref="photoToSend" id="addingPhoto" class="inputfile"/>
-            <div id="preview" class="position-relative">
-              <img v-if="url" :src="url" class="round mt-3">
-              <BIconTrash v-if="url" @click="deletePhoto()" class="fs-1 pointer trash position-absolute"/>
+            <div id="preview">
+              <p class="ms-2 fs-4 mt-3 mb-0 text-start"> {{ text }}</p>
+              <div class="position-relative">
+                <img v-if="url" :src="url" class="round mt-3">
+                <BIconTrash v-if="url" @click="deletePhoto()" class="fs-1 pointer trash position-absolute"/>
+              </div>
             </div>
-            
             <div v-if="url" class="d-flex">
               <button v-if="url" @click="loadPhoto()" class="btn btng w-100 mt-3 me-4" for="addingPhoto">Modifier la photo</button>
-              <button @click="send()" class="btn btng w-100 mt-3" for="addingPhoto">Envoyer</button>
+              <button @click="send()" class="btn btng w-100 mt-3" for="addingPhoto">Publier</button>
             </div>
             <button v-else @click="loadPhoto()" class="btn btng w-100 mt-3" for="addingPhoto">Ajouter une photo</button>
           </div>
         </div>
+        
         <ul id="postings">
           <li v-for="posting in postings" :key="posting.id">
             <div class="bg-white round d-flex pt-3 flex-column p-4 mb-4 shadow mx-2">
@@ -57,31 +61,30 @@
                       <div v-if="$store.state.user.userId != posting.User.id" class="p-2 ps-3">Signaler</div>
                     </li>
                     <li>
-                      <div v-if="$store.state.user.userId != posting.User.id" class="p-2 ps-3">Liker !</div>
-                    </li>
-                    <li>
-                      <div v-if="$store.state.user.userId == posting.User.id" class="p-2 ps-3">modifier</div>
+                      <div v-if="$store.state.user.userId == posting.User.id  || $store.state.user.admin" @click="modifyPost(posting)" class="p-2 ps-3 pointer">modifier</div>
                     </li>
                     <li>
                       <div class="p-2 ps-3"><router-link class="" :to="{ name: 'Profil', params: { id: posting.User.id }}">Voir le profil</router-link></div>
                     </li>
                     <li>
-                      <div class="p-2 ps-3">Répondre</div>
-                    </li>
-                    <li>
-                      <div v-if="$store.state.user.userId == posting.User.id" @click="deletePost(posting.id)" class="p-2 ps-3 pointer">Supprimer</div>
+                      <div v-if="$store.state.user.userId == posting.User.id  || $store.state.user.admin" @click="deletePost(posting.id, posting.userId)" class="p-2 ps-3 pointer">Supprimer</div>
                     </li>
                   </ul>
                 </div>
-              </div>
+              </div><hr>
               <div class="">
-                <p class="text-start fs-4">
-                  {{posting.text}}
-                </p>
-                <div v-if="posting.image != ''">
-                    <img class="w-100 round mb-3" :src="posting.image" alt="" />
+                <p v-if="!posting.toggle" class="text-start fs-4 mb-0">{{posting.text}}</p>
+                <input v-else class="ps-2 w-100 py-2 mb-3 round" type="text" name="modifyPost" id="textModified" :value="posting.text">
+                <div v-if="posting.image != null" class="position-relative">
+                    <img class="w-100 round my-3" :src="posting.image" alt="" />
+                    <BIconTrash v-if="posting.toggle" @click="deletePhoto()" class="fs-1 pointer trash position-absolute"/>
                 </div>
-              </div>
+                <div class="d-flex">
+                  <input @change="addPhoto()" type="file" ref="modifiedPhotoToSend" id="modifyPhoto" class="inputfile"/>
+                  <button v-if="posting.toggle" @click="modifyPhoto()" class="btn btng w-100 mt-2 me-4" for="modifyPhoto">Changer l'image</button>
+                  <button v-if="posting.toggle" @click="modifyProfil()" class="btn btng w-100 mt-2" for="modifyPhoto">Publier</button>
+                </div>
+              </div><hr>
               <div class="d-flex justify-content-between text-secondary">
                 <a class="text-decoration-none text-secondary" data-bs-toggle="collapse" href="#collapseExample" role="button"
                   aria-expanded="false" aria-controls="collapseExample">4 commentaires
@@ -131,22 +134,29 @@ export default {
       postings: {},
       textcomment: '',
       emoji: false,
-      emojiLists: {1:"😀",2:"😁",3:"😂",4:"😃"},
+      emojiLists: [
+        "😀","😁","😂","😃","😄","😅","😆","😇","😈","😉","😊","😋","😌","😍","😎","😏","😐",
+        "😑","😒","😓","😔","😕","😖","😗","😘","😙","😚","😛","😜","😝","😞","😟","😠","😡",
+        "😢","😣","😤","😥","😦","😧","😨","😩","😪","😫","😬","😭","😮","😯","😰","😱","😲",
+        "😳","😴","😵","😶","😷","😸","😹","😺","😻","😼","😽","😾","😿","🙀","🙁","🙂","🙃",
+        "🙄","🤐","🤑","🤒","🤓","🤔","🤕","🥰","🥱","🥳","🥴","🥵","🤠","🤡","🤢","🤣","🤤",
+        "🤥","🤧","🤨","🤩","🤪","🤫","🤬","🤭","🤮","🤯","👋","👌","👍","👎","👏","👐",],
       photo: false,
       url: '',
-      photoToSend: ref('')
+      photoToSend: ref(''),
     }
   },
   methods:{
     send(){
-      console.log(this.$refs.photoToSend.files[0]);
-      this.image = this.$refs.photoToSend.files[0];
       let formData = new FormData();
-      formData.append('image', this.image)
+      if(this.$refs.photoToSend != null || this.$refs.photoToSend != undefined){
+        this.image = this.$refs.photoToSend.files[0];
+        formData.append('image', this.image)
+      }
       formData.append('text', this.text)
       formData.append('userId', localStorage.getItem('userId'))
       axios.post('http://localhost:3000/postings/', formData, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
-      .then(()=>{this.text = '';this.deletePhoto(); this.getAllPost()})
+      .then(()=>{this.text = ''; this.image = null; this.url= ''; this.emoji = false; this.photo = false; this.getAllPost()})
       .catch((error) =>{console.log(error)})
     },
     getAllPost(){
@@ -154,8 +164,8 @@ export default {
       .then((response)=>{this.postings = response.data; console.log(this.postings)})
       .catch((error) =>{console.log(error)})
     },
-    deletePost(id){
-      axios.delete('http://localhost:3000/postings/by/' + localStorage.getItem('userId') + "/" + id, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
+    deletePost(id, user){
+      axios.delete('http://localhost:3000/postings/by/' + user + "/" + id, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
       .then(()=>{this.getAllPost()})
       .catch((error) =>{console.log(error)})
     },
@@ -166,10 +176,15 @@ export default {
       this.photo = !this.photo
     },
     addEmoji(emoji){
-      this.text = this.text.concat(' ', emoji)
+      this.text = this.text.concat(' ', emoji); this.emoji = false;
     },
     loadPhoto(){
       let fileEl = document.getElementById("addingPhoto");
+      fileEl.click()
+      console.log(fileEl)
+    },
+    modifyPhoto(){
+      let fileEl = document.getElementById("modifyPhoto");
       fileEl.click()
     },
     addPhoto(){
@@ -179,6 +194,10 @@ export default {
     deletePhoto(){
       this.url = '';
       this.photo = !this.photo
+    },
+    modifyPost(posting){
+      posting.toggle = !posting.toggle
+      console.log(posting)
     }
   },
   beforeMount: function() {
@@ -246,7 +265,7 @@ img {
   right: 12rem
 }
 .pen{
-  top: .8rem;
+  top: .6rem;
   left: 3.6rem
 }
 ul{
@@ -258,7 +277,7 @@ ul{
   border-left: 2px solid rgb(233, 68, 38);
 }
 ul{
-  border-radius: .8rem;
+  border-radius: .6rem;
   overflow: hidden;
 }
 .inputfile{

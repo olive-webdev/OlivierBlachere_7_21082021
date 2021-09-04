@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const jwt    = require("jsonwebtoken");
 const models = require("../models/");
 const multer = require('../middleware/multer');
+const fs = require('fs');
 
 exports.signup = (req, res) => {
     // récupération des informations entrées par l'utilisateur
@@ -164,6 +165,13 @@ exports.modifyPhoto = (req, res) => {
                     .then((User) => {
                         if(User === null){res.status(500).json({ 'error': "pas d'utilisateur trouvé" })}
                         else{
+                            const filename = User.Ppicture.split('/images/')[1];
+                            fs.unlink(`images/${filename}`, (err) => {
+                                if (err) {
+                                    console.log("impossible de supprimer l'image:"+err);
+                                } else {
+                                    console.log('image supprimée');                                
+                                }})
                             User.Ppicture = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
                             User.save()
                             .then(()=>{res.status(200).json({ 'message': "données de l'utilisateur modifié par l'utilisateur"});})
@@ -184,6 +192,13 @@ exports.modifyPhoto = (req, res) => {
         .then((User) => {
             if(User === null){res.status(500).json({ 'error': "pas d'utilisateur trouvé" })}
             else{
+                const filename = User.Ppicture.split('/images/')[1];
+                fs.unlink(`images/${filename}`, (err) => {
+                    if (err) {
+                        console.log("impossible de supprimer l'image:"+err);
+                    } else {
+                        console.log('image supprimée');                                
+                    }})
                 User.Ppicture = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
                 User.save()
                 .then(()=>{res.status(200).json({ 'message': "données de l'utilisateur modifié par l'utilisateur"});})
@@ -196,7 +211,6 @@ exports.modifyPhoto = (req, res) => {
 
 exports.deletePhoto = (req, res) => {
     const id = req.params.id;
-    console.log(id);
     const token = req.headers.authorization.split(' ')[1];
     const decodedToken = jwt.verify(token, "privateKey");
     const userId = decodedToken.userId;
@@ -212,10 +226,11 @@ exports.deletePhoto = (req, res) => {
                     .then((User) => {
                         if(User === null){res.status(500).json({ 'error': "pas d'utilisateur trouvé" })}
                         else{
-                            User.Ppicture = null;
+                            const filename = User.Ppicture.split('/images/')[1];// suppression de l'ancienne image
+                            fs.unlink(`./images/${filename}`, () => {
                             User.save()
                             .then(()=>{res.status(200).json({ 'message': "photo supprimée par l'administrateur"});})
-                            .catch(()=>{res.status(500).json({ 'error': "impossible de supprimer la photo" })})
+                            .catch(()=>{res.status(500).json({ 'error': "impossible de supprimer la photo" })})})
                         }
                     })
                     .catch(() => res.status(500).json({ 'error': "pas d'utilisateur trouvé" }));
@@ -232,10 +247,13 @@ exports.deletePhoto = (req, res) => {
         .then((User) => {
             if(User === null){res.status(500).json({ 'error': "pas d'utilisateur trouvé" })}
             else{
+                console.log(User.Ppicture)
+                const filename = User.Ppicture.split('/images/')[1]; // suppression de l'ancienne image
+                fs.unlink(`./images/${filename}`, () => {
                 User.Ppicture = null;
                 User.save()
                 .then(()=>{res.status(200).json({ 'message': "photo supprimée par l'utilisateur"});})
-                .catch(()=>{res.status(500).json({ 'error': "impossible de modifier la photo" })})
+                .catch(()=>{res.status(500).json({ 'error': "impossible de supprimer la photo" })})})
             }
         })
         .catch(() => res.status(500).json({ 'error': "impossible de supprimer" }));

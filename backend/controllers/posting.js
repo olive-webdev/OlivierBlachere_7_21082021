@@ -1,19 +1,29 @@
 const models = require("../models/");
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
 
 exports.createPosting = (req, res) => {
     const text   = req.body.text;
-    const image  = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
     const userId = req.body.userId;
-
+    console.log(req.file)
+    if(req.file != undefined)
+    {const image  = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
     models.Posting.create({ userId: userId, text: text, image: image })
-                .then((newPosting) => res.status(201).json({
-                    'message'    : "publication créée !",
-                    'userId'     : newPosting.userId,
-                    'text'       : newPosting.text,
-                    'image'      : newPosting.image,
-                    'créé le'    : newPosting.createdAt}))
-                .catch((error) => {  console.log(error) })
+    .then((newPosting) => res.status(201).json({
+        'message'    : "publication créée !",
+        'userId'     : newPosting.userId,
+        'text'       : newPosting.text,
+        'image'      : newPosting.image,
+        'créé le'    : newPosting.createdAt}))
+    .catch((error) => {  console.log(error) })}    
+    else{const image = null;
+    models.Posting.create({ userId: userId, text: text, image: image })
+        .then((newPosting) => res.status(201).json({
+            'message'    : "publication créée !",
+            'userId'     : newPosting.userId,
+            'text'       : newPosting.text,
+            'créé le'    : newPosting.createdAt}))
+        .catch((error) => {  console.log(error) })}
 };
 
 exports.getAllPostings = (req, res) => {
@@ -114,6 +124,7 @@ exports.deletePosting = (req, res) => {
     const token        = req.headers.authorization.split(' ')[1];
     const decodedToken = jwt.verify(token, "privateKey");
     const userId       = decodedToken.userId;
+    console.log(id, userId)
     if(userId != id){
         models.User.findOne({
             where: { id : userId }
@@ -121,16 +132,25 @@ exports.deletePosting = (req, res) => {
         .then((User) => {
             if(User.admin === true){
                 models.Posting.findOne({
-                    where: { UserId : id, id : idPosting }
+                    where: { id : idPosting }
                     })
                     .then((Posting) => {
                         if(Posting === null){res.status(500).json({ 'error': "pas de publication trouvée" })}
                         else{
-                            models.Posting.destroy({where: { id : idPosting }})
-                            .then(() => {res.status(200).json({'message' : "publication supprimée par l'administrateur"})})
-                            .catch(() => res.status(500).json({ 'error': "erreur à la suppression de la publication" }))}
+                            if(Posting.image != null){
+                                const filename = Posting.image.split('/images/')[1]; // suppression de l'ancienne image
+                                fs.unlink(`images/${filename}`, () =>{
+                                models.Posting.destroy({where: { id : idPosting }})
+                                .then(() => {res.status(200).json({'message' : "publication supprimée par l'utilisateur"})})
+                                .catch(() => res.status(500).json({ 'error': "erreur à la suppression de la publication" }))
+                                })}
+                                else{
+                                    models.Posting.destroy({where: { id : idPosting }})
+                                    .then(() => {res.status(200).json({'message' : "publication supprimée par l'utilisateur"})})
+                                    .catch(() => res.status(500).json({ 'error': "erreur à la suppression de la publication" }))
+                                }}
                     })
-                    .catch(() => res.status(500).json({ 'error': "pas de publication trouvée" }))
+                    .catch(() => res.status(500).json({ 'error': "erreur à la suppression de la publication" }))
             }
             else{
                 res.status(500).json({ 'error': "vous devez être administrateur pour effectuer cette opération"});}
@@ -144,9 +164,19 @@ exports.deletePosting = (req, res) => {
             .then((Posting) => {
                 if(Posting === null){res.status(500).json({ 'error': "pas de publication trouvée" })}
                 else{
+                    if(Posting.image != null){
+                    const filename = Posting.image.split('/images/')[1]; // suppression de l'ancienne image
+                    fs.unlink(`images/${filename}`, () =>{
                     models.Posting.destroy({where: { id : idPosting }})
                     .then(() => {res.status(200).json({'message' : "publication supprimée par l'utilisateur"})})
-                    .catch(() => res.status(500).json({ 'error': "erreur à la suppression de la publication" }))}
+                    .catch(() => res.status(500).json({ 'error': "erreur à la suppression de la publication" }))
+                    })}
+                    else{
+                        models.Posting.destroy({where: { id : idPosting }})
+                        .then(() => {res.status(200).json({'message' : "publication supprimée par l'utilisateur"})})
+                        .catch(() => res.status(500).json({ 'error': "erreur à la suppression de la publication" }))
+                    }
+                }
             })
             .catch(() => res.status(500).json({ 'error': "pas de publication trouvée" }))
     }
