@@ -21,11 +21,6 @@
             <div  class="me-auto ms-3 d-none d-lg-block">Se déconnecter</div>
           </div>
         </router-link>
-        <router-link class="" :to="{ name: 'Profil', params: {id: 13}}">
-          <div class="d-flex justify-content-between align-items-center py-3" >
-            <div class="me-auto ms-3 d-none d-lg-block">Profil</div>
-          </div>
-        </router-link>
   </div>
 
   </div>

@@ -252,7 +252,7 @@ li{
     width: 200px;
 }
 .btn{
-  height: 50px;
+  height: 60px;
 }
 .inputfile{
   display: none;

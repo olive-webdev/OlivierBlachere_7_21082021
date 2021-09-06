@@ -3,10 +3,10 @@
     <Header />
     <div class="row">
       <div class="col-3 mt-3">
-        <Menu />
+        <Menu class="sticky-top" />
       </div>
       <div class="col-9 mt-3">
-        <div class="bg-white round d-flex flex-column px-4 py-3 mb-4 shadow mx-2">
+        <div class="bg-white round d-flex flex-column px-4 py-3 mb-4 shadow mx-2 sticky-top">
           <div class="d-flex input-group position-relative">
             <div class="thumbnailright">
               <img v-if="$store.state.user.Ppicture" class="border-end-0" :src="$store.state.user.Ppicture"/>
@@ -15,7 +15,8 @@
             <input v-model="text" type="text" class="form-controlled border-start-0 ps-5 w" :placeholder="'Quoi de neuf ' + $store.state.user.name + ' ?'"/>
             <BIconPencilFill class="position-absolute pen fs-4"/>
             <p @click="emojiToggle()" class="position-absolute smiley fs-3 pointer">&#128512; </p>
-            <p @click="photoToggle()" class="position-absolute image fs-3 pointer">&#127748; </p>
+            <p @click="loadPhoto()" class="position-absolute image fs-3 pointer">&#127748; </p>
+            <input @change="addPhoto()" type="file" ref="photoToSend" id="addingPhoto" class="inputfile"/>
             <div @click="send()" type="button" class="btn btng d-flex align-items-center border-start-0">
               Envoyer !<BIconArrowRightSquare class="fs-4 ms-2" /></div>
           </div>
@@ -24,9 +25,7 @@
               <li @click="addEmoji(emojiList)" class="mx-1 pointer" v-for="emojiList in emojiLists" :key="emojiList">{{emojiList}}</li>
             </ul>
           </div>
-
-          <div v-if="photo" id="photo">
-            <input @change="addPhoto()" type="file" ref="photoToSend" id="addingPhoto" class="inputfile"/>
+          <div v-if="url" id="photo">
             <div id="preview">
               <p class="ms-2 fs-4 mt-3 mb-0 text-start"> {{ text }}</p>
               <div class="position-relative">
@@ -34,16 +33,15 @@
                 <BIconTrash v-if="url" @click="deletePhoto()" class="fs-1 pointer trash position-absolute"/>
               </div>
             </div>
-            <div v-if="url" class="d-flex">
-              <button v-if="url" @click="loadPhoto()" class="btn btng w-100 mt-3 me-4" for="addingPhoto">Modifier la photo</button>
+            <div class="d-flex">
+              <button  @click="loadPhoto()" class="btn btng w-100 mt-3 me-4" for="addingPhoto">Modifier la photo</button>
               <button @click="send()" class="btn btng w-100 mt-3" for="addingPhoto">Publier</button>
             </div>
-            <button v-else @click="loadPhoto()" class="btn btng w-100 mt-3" for="addingPhoto">Ajouter une photo</button>
           </div>
         </div>
         
         <ul id="postings">
-          <li v-for="posting in postings" :key="posting.id">
+          <li v-for="posting in postings" :key="posting.image">
             <div class="bg-white round d-flex pt-3 flex-column p-4 mb-4 shadow mx-2">
               <div class="d-flex justify-content-between">
                 <div class="thumbnail shadow">
@@ -58,36 +56,56 @@
                   <div class="" type="button" data-bs-toggle="dropdown" aria-expanded="false"><BIconInfoSquare class="fs-4 text-danger"/></div>
                   <ul id="menuPost" class="dropdown-menu" aria-labelledby="menuPost">
                     <li>
-                      <div v-if="$store.state.user.userId != posting.User.id" class="p-2 ps-3">Signaler</div>
+                      <div v-if="$store.state.user.userId != posting.User.id && !$store.state.user.admin" class="p-2 ps-3">Signaler</div>
                     </li>
                     <li>
                       <div v-if="$store.state.user.userId == posting.User.id  || $store.state.user.admin" @click="modifyPost(posting)" class="p-2 ps-3 pointer">modifier</div>
                     </li>
                     <li>
-                      <div class="p-2 ps-3"><router-link class="" :to="{ name: 'Profil', params: { id: posting.User.id }}">Voir le profil</router-link></div>
+                      <div v-if="$store.state.user.userId != posting.User.id" class="p-2 ps-3"><router-link class="" :to="{ name: 'Profil', params: { id: posting.User.id }}">Voir le profil</router-link></div>
                     </li>
                     <li>
                       <div v-if="$store.state.user.userId == posting.User.id  || $store.state.user.admin" @click="deletePost(posting.id, posting.userId)" class="p-2 ps-3 pointer">Supprimer</div>
                     </li>
                   </ul>
                 </div>
-              </div><hr>
+              </div>
+              <hr>
               <div class="">
                 <p v-if="!posting.toggle" class="text-start fs-4 mb-0">{{posting.text}}</p>
                 <input v-else class="ps-2 w-100 py-2 mb-3 round" type="text" name="modifyPost" id="textModified" :value="posting.text">
+
                 <div v-if="posting.image != null" class="position-relative">
-                    <img class="w-100 round my-3" :src="posting.image" alt="" />
-                    <BIconTrash v-if="posting.toggle" @click="deletePhoto()" class="fs-1 pointer trash position-absolute"/>
+                    <img v-if="modifiedUrl != '' && posting.toggle" class="w-100 round my-3 " :src="modifiedUrl" alt="" />
+                    <img v-if="modifiedUrl != '' && !posting.toggle" class="w-100 round my-3 " :src="posting.image" alt="" />
+                    <img v-if="modifiedUrl == '' && !posting.imageDeleted && posting.toggle" class="w-100 round my-3" :src="posting.image" alt=""/>
+                    <img v-if="modifiedUrl == '' && !posting.imageDeleted && !posting.toggle" class="w-100 round my-3" :src="posting.image" alt=""/>
+                    <div v-if="modifiedUrl == '' && !posting.imageDeleted"></div>
+                    <BIconTrash v-if="modifiedUrl != '' && posting.toggle && posting.imageDeleted || posting.image && posting.toggle && !posting.imageDeleted" @click="deletePhoto(posting)" class="fs-1 pointer trash position-absolute"/>
                 </div>
+                <div v-else-if="posting.image">
+                  <img class="w-100 round my-3" :src="modifiedUrl" alt="" />
+                </div>
+
+                <div v-else class="position-relative">
+                  <img v-if="modifiedUrl != '' && posting.toggle" class="w-100 round my-3" :src="modifiedUrl" alt="" />
+                  <BIconTrash v-if="modifiedUrl != '' && posting.toggle" @click="deletePhoto(posting)" class="fs-1 pointer trash position-absolute"/>
+                </div>
+
                 <div class="d-flex">
-                  <input @change="addPhoto()" type="file" ref="modifiedPhotoToSend" id="modifyPhoto" class="inputfile"/>
-                  <button v-if="posting.toggle" @click="modifyPhoto()" class="btn btng w-100 mt-2 me-4" for="modifyPhoto">Changer l'image</button>
-                  <button v-if="posting.toggle" @click="modifyProfil()" class="btn btng w-100 mt-2" for="modifyPhoto">Publier</button>
+                  <button v-if="posting.toggle && posting.image || posting.toggle && modifiedUrl != ''" @click="modifyPhoto(posting)" class="btn btng w-100 mt-2 me-4" for="modifyPhoto">Changer l'image</button>
+                  <button v-if="posting.toggle && !posting.image && modifiedUrl == ''" @click="modifyPhoto(posting)" class="btn btng w-100 mt-2 me-4" for="modifyPhoto">Ajouter une image</button>
+                  <button v-if="posting.toggle" @click="modifyProfil(posting)" class="btn btng w-100 mt-2" for="modifyPhoto">Publier</button>
+                  <input @change="addModifiedPhoto(posting)" type="file" :id="posting.id" class="inputfile"/>
                 </div>
-              </div><hr>
+              </div>
+              <hr>
+              
               <div class="d-flex justify-content-between text-secondary">
-                <a class="text-decoration-none text-secondary" data-bs-toggle="collapse" href="#collapseExample" role="button"
-                  aria-expanded="false" aria-controls="collapseExample">4 commentaires
+                <BIconHandThumbsUp @click="like(posting)" class="fs-3 text-danger mb-3 pointer" />
+                <!-- <span @click="getLikes(posting)">getLike</span> -->
+                <a class="text-decoration-none text-secondary fs-5" data-bs-toggle="collapse" href="#collapseExample" role="button"
+                  aria-expanded="false" aria-controls="collapseExample">x commentaires todo
                 </a>
               </div>
               <div class="collapse" id="collapseExample">messages</div>
@@ -115,11 +133,9 @@
 <script>
 import Header from "../components/Header.vue";
 import Menu from "../components/Menu.vue";
-const axios = require("axios").default;
 import { useRouter } from "vue-router";
 import { ref } from '@vue/reactivity';
-
-
+const axios = require("axios").default;
 export default {
   name: "PostFeed",
   components: {
@@ -141,8 +157,9 @@ export default {
         "😳","😴","😵","😶","😷","😸","😹","😺","😻","😼","😽","😾","😿","🙀","🙁","🙂","🙃",
         "🙄","🤐","🤑","🤒","🤓","🤔","🤕","🥰","🥱","🥳","🥴","🥵","🤠","🤡","🤢","🤣","🤤",
         "🤥","🤧","🤨","🤩","🤪","🤫","🤬","🤭","🤮","🤯","👋","👌","👍","👎","👏","👐",],
-      photo: false,
+      // photo: false,
       url: '',
+      modifiedUrl: '',
       photoToSend: ref(''),
     }
   },
@@ -151,13 +168,41 @@ export default {
       let formData = new FormData();
       if(this.$refs.photoToSend != null || this.$refs.photoToSend != undefined){
         this.image = this.$refs.photoToSend.files[0];
+        formData.append('image', this.image)}
+        formData.append('text', this.text)
+        formData.append('userId', localStorage.getItem('userId'))
+        axios.post('http://localhost:3000/postings/', formData, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
+        .then(()=>{this.text = ''; this.image = null; this.url= ''; this.getAllPost()})
+        .catch((error) =>{console.log(error)})
+    },
+    modifyProfil(posting){
+      let formData = new FormData();
+      if(document.getElementById(posting.id).files[0] != null || document.getElementById(posting.id).files[0] != undefined){
+        console.log("with image")
+        this.image = document.getElementById(posting.id).files[0];
         formData.append('image', this.image)
+        formData.append('text', document.getElementById("textModified").value)
+        formData.append('userId', localStorage.getItem('userId'))
+        axios.put('http://localhost:3000/postings/by/' +posting.UserId+ "/" + posting.id , formData, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
+        .then(()=>{this.getAllPost()})
+        .catch((error) =>{console.log(error)})}
+      else {
+        console.log("image delete")
+        if(posting.imageDeleted){
+          formData.append('text', document.getElementById("textModified").value)
+          formData.append('userId', localStorage.getItem('userId'))
+          axios.put('http://localhost:3000/postings/by/' +posting.UserId+ "/" + posting.id , formData, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
+          .then(()=>{this.getAllPost();this.emoji = false; this.photo = false;})
+          .catch((error) =>{console.log(error)})}
+        else{
+        console.log("same image")
+          formData.append('image', 'noChange')
+          formData.append('text', document.getElementById("textModified").value)
+          formData.append('userId', localStorage.getItem('userId'))
+          axios.put('http://localhost:3000/postings/by/' +posting.UserId+ "/" + posting.id , formData, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
+          .then(()=>{this.getAllPost();this.emoji = false; this.photo = false;})
+          .catch((error) =>{console.log(error)})}
       }
-      formData.append('text', this.text)
-      formData.append('userId', localStorage.getItem('userId'))
-      axios.post('http://localhost:3000/postings/', formData, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
-      .then(()=>{this.text = ''; this.image = null; this.url= ''; this.emoji = false; this.photo = false; this.getAllPost()})
-      .catch((error) =>{console.log(error)})
     },
     getAllPost(){
       axios.get('http://localhost:3000/postings/', { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
@@ -172,32 +217,48 @@ export default {
     emojiToggle(){
       this.emoji = !this.emoji
     },
-    photoToggle(){
-      this.photo = !this.photo
-    },
     addEmoji(emoji){
       this.text = this.text.concat(' ', emoji); this.emoji = false;
     },
     loadPhoto(){
       let fileEl = document.getElementById("addingPhoto");
-      fileEl.click()
-      console.log(fileEl)
+      fileEl.click();
+      this.emoji = false
     },
-    modifyPhoto(){
-      let fileEl = document.getElementById("modifyPhoto");
+    modifyPhoto(posting){
+      let fileEl = document.getElementById(posting.id);
       fileEl.click()
     },
     addPhoto(){
       const photoPreview = this.$refs.photoToSend.files[0];
       this.url = URL.createObjectURL(photoPreview);
     },
-    deletePhoto(){
+    addModifiedPhoto(posting){
+      let photoToChange = document.getElementById(posting.id).files[0]
+      this.modifiedUrl = URL.createObjectURL(photoToChange);
+      posting.imageDeleted = false
+    },
+    deletePhoto(posting){
       this.url = '';
-      this.photo = !this.photo
+      this.modifiedUrl= '',
+      posting.imageDeleted = true
+      this.photo = !this.photo;
+      console.log(this.modifiedUrl , posting.imageDeleted)
     },
     modifyPost(posting){
       posting.toggle = !posting.toggle
       console.log(posting)
+    },
+    like(posting){
+      console.log("un ptit like")
+      axios.post('http://localhost:3000/likes/posting/'+posting.id, {userId :localStorage.getItem('userId')}, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
+      .then(()=>{this.getAllPost()})
+      .catch((error) =>{console.log(error)})
+    },
+    getLikes(posting){
+      axios.get('http://localhost:3000/likes/posting/'+posting.id, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
+      .then(()=>{this.getAllPost()})
+      .catch((error) =>{console.log(error)})
     }
   },
   beforeMount: function() {
@@ -221,6 +282,9 @@ export default {
   mounted() {
     this.getAllPost()
   },
+  created(){
+    this.getAllPost()
+  }
   
 };
 </script>
@@ -286,5 +350,8 @@ ul{
 .trash{
   top : 3rem;
   right: 2rem;
+}
+#emoji li:hover{
+  font-size: 3rem
 }
 </style>

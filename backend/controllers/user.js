@@ -192,17 +192,25 @@ exports.modifyPhoto = (req, res) => {
         .then((User) => {
             if(User === null){res.status(500).json({ 'error': "pas d'utilisateur trouvé" })}
             else{
-                const filename = User.Ppicture.split('/images/')[1];
-                fs.unlink(`images/${filename}`, (err) => {
-                    if (err) {
-                        console.log("impossible de supprimer l'image:"+err);
-                    } else {
-                        console.log('image supprimée');                                
-                    }})
-                User.Ppicture = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
-                User.save()
-                .then(()=>{res.status(200).json({ 'message': "données de l'utilisateur modifié par l'utilisateur"});})
-                .catch(()=>{res.status(500).json({ 'error': "impossible de modifier la photo" })})
+                if(User.Ppicture === null){
+                    User.Ppicture = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+                    User.save()
+                    .then(()=>{res.status(200).json({ 'message': "données de l'utilisateur modifié par l'utilisateur"});})
+                    .catch(()=>{res.status(500).json({ 'error': "impossible de modifier la photo" })})
+                }
+                else{
+                    const filename = User.Ppicture.split('/images/')[1];
+                    fs.unlink(`images/${filename}`, (err) => {
+                        if (err) {
+                            console.log("impossible de supprimer l'image:"+err);
+                        } else {
+                            console.log('image supprimée');                                
+                        }})
+                    User.Ppicture = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+                    User.save()
+                    .then(()=>{res.status(200).json({ 'message': "données de l'utilisateur modifié par l'utilisateur"});})
+                    .catch(()=>{res.status(500).json({ 'error': "impossible de modifier la photo" })})
+                }
             }
         })
         .catch(() => res.status(500).json({ 'error': "impossible de mettre à jour" }));

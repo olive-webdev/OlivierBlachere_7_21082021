@@ -1,5 +1,5 @@
 <template>
-  <div class="container bg-light px-4">
+  <div class="container bg-light px-4 vh-100">
     <Header  />
     <SignupLogin class="mt-5" />
   </div>
