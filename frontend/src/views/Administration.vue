@@ -1,5 +1,45 @@
 <template>
-  <div>
-    <h1>This is the administration page</h1>
+  <div class="container bg-light px-4 vh-100">
+    <Header  />
+    <div class="row">
+      <div class="col-3 mt-3">
+        <Menu />
+      </div>
+      <div class="col-9 mt-3">
+        <Admin />
+      </div>
+    </div>
   </div>
 </template>
+<script>
+import Header from '../components/Header.vue';
+import Menu from '../components/Menu.vue';
+import { useRouter } from "vue-router";
+import Admin from '../components/Admin.vue'
+export default {
+  name: "Profil",
+  components: {Header, Menu, Admin},
+  data(){
+    return{
+      router: useRouter(),
+    }
+  },
+
+   beforeMount: function(){
+    if(!this.$store.state.user.token && !localStorage.getItem('token')){
+      this.$router.push("/connexion")
+      console.log("utilisateur non connecté")
+    }
+    else if(!this.$store.state.user.token && localStorage.getItem('token')){
+      this.$store.dispatch('getUser', {
+      id: localStorage.getItem('userId'),
+      token: localStorage.getItem('token')})
+      .then(() => { console.log(this.$store.state.user) })
+      .catch()
+    }
+    else{
+      return;
+    }
+  }
+};
+</script>

@@ -10,13 +10,14 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      models.Report.belongsTo(models.Posting)
+      models.Report.belongsTo(models.User)
     }
   };
   Report.init({
     userId: DataTypes.INTEGER,
-    reportToPostingId: DataTypes.INTEGER,
-    reportToCommentID: DataTypes.INTEGER
+    postingId: DataTypes.INTEGER,
+    commentId: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Report',

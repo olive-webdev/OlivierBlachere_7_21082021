@@ -41,7 +41,7 @@
         </div>
         
         <ul id="postings">
-          <li v-for="posting in postings" :key="posting.image">
+          <li v-for="posting in postings" :key="posting.id">
             <div class="bg-white round d-flex pt-3 flex-column p-4 mb-4 shadow mx-2">
               <div class="d-flex justify-content-between">
                 <div class="thumbnail shadow">
@@ -52,11 +52,12 @@
                   <h3 class="m-0 text-start">{{posting.User.name}} {{posting.User.surname}}</h3>
                   <p @click="getSince()" class="text-start">publié le {{posting.createdAt.slice(8,10)}} {{posting.createdAt.slice(5,7)}} {{posting.createdAt.slice(0,4)}}</p>
                 </div>
+                <div v-if="posting.Reports.length > 0"><BIconExclamationSquareFill class="text-danger fs-4 me-3"/></div>
                 <div class="dropdown">
                   <div class="" type="button" data-bs-toggle="dropdown" aria-expanded="false"><BIconInfoSquare class="fs-4 text-danger"/></div>
                   <ul id="menuPost" class="dropdown-menu" aria-labelledby="menuPost">
                     <li>
-                      <div v-if="$store.state.user.userId != posting.User.id && !$store.state.user.admin" class="p-2 ps-3">Signaler</div>
+                      <div v-if="$store.state.user.userId != posting.User.id && !$store.state.user.admin" class="p-2 ps-3 pointer" @click="report(posting)">Signaler</div>
                     </li>
                     <li>
                       <div v-if="$store.state.user.userId == posting.User.id  || $store.state.user.admin" @click="modifyPost(posting)" class="p-2 ps-3 pointer">modifier</div>
@@ -101,9 +102,16 @@
               </div>
               <hr>
               
-              <div class="d-flex justify-content-between text-secondary">
-                <BIconHandThumbsUp @click="like(posting)" class="fs-3 text-danger mb-3 pointer" />
-                <!-- <span @click="getLikes(posting)">getLike</span> -->
+              <div class="d-flex justify-content-between align-items-center text-secondary mb-3">
+                <BIconHandThumbsUp @click="like(posting)" class="fs-3 text-danger pointer" />
+                <div class="me-auto ms-2 mt-2 d-flex align-items-center pointer likes position-relative"> {{ posting.Likes.length}} 
+                  <ul class="border">
+                    <li v-for="Like in posting.Likes" :key="Like.id" class="d-flex me-1"> {{ Like.User.name }} {{ Like.User.surname +"," }}</li>
+                    <li v-if="posting.Likes.length <2">a aimé ce post</li>
+                    <li v-else>ont aimé ce post</li>
+                  </ul>
+                </div>
+                
                 <a class="text-decoration-none text-secondary fs-5" data-bs-toggle="collapse" href="#collapseExample" role="button"
                   aria-expanded="false" aria-controls="collapseExample">x commentaires todo
                 </a>
@@ -157,7 +165,6 @@ export default {
         "😳","😴","😵","😶","😷","😸","😹","😺","😻","😼","😽","😾","😿","🙀","🙁","🙂","🙃",
         "🙄","🤐","🤑","🤒","🤓","🤔","🤕","🥰","🥱","🥳","🥴","🥵","🤠","🤡","🤢","🤣","🤤",
         "🤥","🤧","🤨","🤩","🤪","🤫","🤬","🤭","🤮","🤯","👋","👌","👍","👎","👏","👐",],
-      // photo: false,
       url: '',
       modifiedUrl: '',
       photoToSend: ref(''),
@@ -252,14 +259,15 @@ export default {
     like(posting){
       console.log("un ptit like")
       axios.post('http://localhost:3000/likes/posting/'+posting.id, {userId :localStorage.getItem('userId')}, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
-      .then(()=>{this.getAllPost()})
+      .then(() => this.getAllPost())
       .catch((error) =>{console.log(error)})
     },
-    getLikes(posting){
-      axios.get('http://localhost:3000/likes/posting/'+posting.id, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
-      .then(()=>{this.getAllPost()})
+    report(posting){
+      console.log("signalement du post")
+      axios.post('http://localhost:3000/reports/posting/'+posting.id, {userId :localStorage.getItem('userId')}, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
+      .then(() => this.getAllPost())
       .catch((error) =>{console.log(error)})
-    }
+    },
   },
   beforeMount: function() {
     if (!this.$store.state.user.token && !localStorage.getItem("token")) {
@@ -272,7 +280,7 @@ export default {
           token: localStorage.getItem("token"),
         })
         .then(() => {
-          console.log(this.$store.state.user);
+          console.log("utilisateur connecté");
         })
         .catch();
     } else {
@@ -353,5 +361,19 @@ ul{
 }
 #emoji li:hover{
   font-size: 3rem
+}
+.likes  ul{
+  display: none;
+}
+.likes:hover  ul{
+  position: absolute;
+  display: flex;
+  min-width: 300px;
+  flex-wrap: wrap;
+  z-index: 20;
+  top: -1rem;
+  left:2rem;
+  padding: .5rem;
+  background-color: white;
 }
 </style>

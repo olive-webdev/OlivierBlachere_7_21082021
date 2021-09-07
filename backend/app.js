@@ -4,7 +4,7 @@ const userRoutes    = require("./routes/user");
 const postRoutes    = require("./routes/posting");
 // const commentRoutes = require("./routes/comment");
 const likeRoutes    = require("./routes/like");
-// const reportRoutes  = require("./routes/report")
+const reportRoutes  = require("./routes/report")
 const path          = require("path");
 const app           = express();
 
@@ -27,6 +27,6 @@ app.use("/users", userRoutes);
 app.use("/postings", postRoutes);
 // app.use("/comments", commentRoutes);
 app.use("/likes", likeRoutes);
-// app.use("/reports", reportRoutes);
+app.use("/reports", reportRoutes);
 
 module.exports = app;

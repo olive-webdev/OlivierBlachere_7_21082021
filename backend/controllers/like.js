@@ -1,14 +1,18 @@
-const jwt    = require("jsonwebtoken");
 const models = require("../models/");
 
 exports.likePosting = (req, res) => {
-        models.Like.create({userId: req.body.userId,likeToPostingId: req.params.postingId,})
-            .then((Like) => {console.log(Like)})
+    models.Like.findOne({where:{userId: req.body.userId, postingId: req.params.postingId}})
+    .then((Like) => {
+        if(Like){
+            models.Like.destroy({where:{userId: req.body.userId, postingId: req.params.postingId}})
+            .then(() => res.status(201).json({message : "like supprimé"}))
+            .catch(() => res.status(500).json({ 'error': "impossible de supprimé le like" }))
+        }
+        else{
+            models.Like.create({userId: req.body.userId, postingId: req.params.postingId,})
+            .then((Like) => res.status(201).json({message : "like créé", Like}))
             .catch(() => res.status(500).json({ 'error': "impossible de liké" }));
-    }
-
-exports.getLikeFromPosting = (req, res) => {
-    models.Like.findAll()
-    .then((Likes) => res.status(200).json(Likes))
-    .catch()
+        }
+    })
+    .catch(() => res.status(500).json({ 'error': "impossible de liker" }))
 }

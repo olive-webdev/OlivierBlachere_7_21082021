@@ -25,13 +25,12 @@ exports.createPosting = (req, res) => {
             'créé le'    : newPosting.createdAt}))
         .catch((error) => {  console.log(error) })}
 };
-
+// models.Category.findAll({include: [{model: models.Product,include: [models.Price],},],});
 exports.getAllPostings = (req, res) => {
-    models.Posting.findAll({include: models.User, order: [['createdAt', 'DESC']]})
+    models.Posting.findAll({include: [{model: models.User},{model: models.Like, include:[models.User]},{model: models.Report, include:[models.User]}] , order: [['createdAt', 'DESC']]})
     .then((Postings) => res.status(200).json(Postings))
-    .catch(() => res.status(500).json({ 'error': "Pas encore de publication" }));
+    .catch(() => res.status(500).json({ 'error': "erreur à l'obtention des posts" }));
 };
-
 
 exports.getAllPostingsBy = (req, res) => {
     const userId = req.params.id;
