@@ -5,7 +5,8 @@ import store from "./store";
 import "bootstrap";
 import {BIconPersonSquare, BIconJournalText, BIconTools, BIconPencilFill, BIconEmojiSmileFill, BIconImage,
         BIconHandThumbsUpFill, BIconXCircle, BIconShieldLockFill, BIconCaretDownSquare,BIconCheckSquare,
-        BIconArrowRightSquare,BIconTrash,BIconPencilSquare,BIconPlusSquare,BIconInfoSquare, BIconHandThumbsUp,BIconExclamationSquareFill} from "bootstrap-icons-vue";
+        BIconArrowRightSquare,BIconTrash,BIconPencilSquare,BIconPlusSquare,BIconInfoSquare, BIconHandThumbsUp,BIconExclamationSquareFill,
+        BIconXSquare} from "bootstrap-icons-vue";
 
 const app = createApp(App);
 app.component("BIconPersonSquare", BIconPersonSquare);
@@ -26,5 +27,7 @@ app.component("BIconPlusSquare", BIconPlusSquare);
 app.component("BIconInfoSquare", BIconInfoSquare);
 app.component("BIconHandThumbsUp", BIconHandThumbsUp);
 app.component("BIconExclamationSquareFill", BIconExclamationSquareFill);
+app.component("BIconXSquare", BIconXSquare);
+
 
 app.use(store).use(router).mount("#app");

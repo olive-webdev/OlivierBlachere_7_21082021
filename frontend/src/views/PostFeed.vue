@@ -6,7 +6,7 @@
         <Menu class="sticky-top" />
       </div>
       <div class="col-9 mt-3">
-        <div class="bg-white round d-flex flex-column px-4 py-3 mb-4 shadow mx-2 sticky-top">
+        <div class="bg-white round d-flex flex-column px-4 py-3 mb-4 shadow mx-2">
           <div class="d-flex input-group position-relative">
             <div class="thumbnailright">
               <img v-if="$store.state.user.Ppicture" class="border-end-0" :src="$store.state.user.Ppicture"/>
@@ -41,7 +41,7 @@
         </div>
         
         <ul id="postings">
-          <li v-for="posting in postings" :key="posting.id">
+          <li v-for="posting in postings" :key="posting.id" :id='"post"+posting.id'>
             <div class="bg-white round d-flex pt-3 flex-column p-4 mb-4 shadow mx-2">
               <div class="d-flex justify-content-between">
                 <div class="thumbnail shadow">
@@ -54,10 +54,13 @@
                 </div>
                 <div v-if="posting.Reports.length > 0"><BIconExclamationSquareFill class="text-danger fs-4 me-3"/></div>
                 <div class="dropdown">
-                  <div class="" type="button" data-bs-toggle="dropdown" aria-expanded="false"><BIconInfoSquare class="fs-4 text-danger"/></div>
+                  <div type="button" data-bs-toggle="dropdown" aria-expanded="false"><BIconInfoSquare class="fs-4 text-danger"/></div>
                   <ul id="menuPost" class="dropdown-menu" aria-labelledby="menuPost">
                     <li>
                       <div v-if="$store.state.user.userId != posting.User.id && !$store.state.user.admin" class="p-2 ps-3 pointer" @click="report(posting)">Signaler</div>
+                    </li>
+                    <li>
+                      <div v-if="$store.state.user.admin" class="p-2 ps-3 pointer" @click="deleteReport(posting)">Retirer le signalement</div>
                     </li>
                     <li>
                       <div v-if="$store.state.user.userId == posting.User.id  || $store.state.user.admin" @click="modifyPost(posting)" class="p-2 ps-3 pointer">modifier</div>
@@ -268,6 +271,11 @@ export default {
       .then(() => this.getAllPost())
       .catch((error) =>{console.log(error)})
     },
+    deleteReport(posting){
+      axios.delete('http://localhost:3000/reports/posting/'+posting.id, { headers: { Authorization: 'bearer ' + localStorage.getItem('token')}})
+      .then(() => this.getAllPost())
+      .catch((error) =>{console.log(error)})
+    },
   },
   beforeMount: function() {
     if (!this.$store.state.user.token && !localStorage.getItem("token")) {
@@ -347,6 +355,9 @@ ul{
 #menuPost li:hover > div{
   background-color: rgb(235, 204, 204);
   border-left: 2px solid rgb(233, 68, 38);
+}
+#menuPost li{
+  width: 200px;
 }
 ul{
   border-radius: .6rem;

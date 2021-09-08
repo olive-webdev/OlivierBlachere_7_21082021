@@ -53,6 +53,17 @@ const routes = [
 ]
 
 const router = createRouter({
+  scrollBehavior(to) {
+    setTimeout(() => {
+      const element = document.getElementById(to.hash.replace(/#/, ''))
+      if (element && element.scrollIntoView) {
+        element.scrollIntoView({block: 'start', behavior: 'smooth'})
+      }
+    }, 500)
+
+    //NOTE: This doesn't work
+    return {selector: to.hash}
+  },
   history: createWebHistory(process.env.BASE_URL),
   routes
 })
