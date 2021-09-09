@@ -27,7 +27,14 @@ exports.createPosting = (req, res) => {
 };
 
 exports.getAllPostings = (req, res) => {
-    models.Posting.findAll({include: [{model: models.User},{model: models.Like, include:[models.User]},{model: models.Report, include:[models.User]}] , order: [['createdAt', 'DESC']]})
+    models.Posting.findAll(
+        {include: [
+            {model: models.User},
+            {model: models.Comment, include:[{model: models.Comment, include:[models.User]}, models.User]},
+            {model: models.Like, include:[models.User]},
+            {model: models.Report, include:[models.User]}
+        ]}
+    )
     .then((Postings) => res.status(200).json(Postings))
     .catch(() => res.status(500).json({ 'error': "erreur à l'obtention des posts" }));
 };
@@ -167,7 +174,6 @@ exports.deletePosting = (req, res) => {
     const token        = req.headers.authorization.split(' ')[1];
     const decodedToken = jwt.verify(token, "privateKey");
     const userId       = decodedToken.userId;
-    console.log(id, userId)
     if(userId != id){
         models.User.findOne({
             where: { id : userId }
@@ -208,11 +214,11 @@ exports.deletePosting = (req, res) => {
                 if(Posting === null){res.status(500).json({ 'error': "pas de publication trouvée" })}
                 else{
                     if(Posting.image != null){
-                    const filename = Posting.image.split('/images/')[1]; // suppression de l'ancienne image
-                    fs.unlink(`images/${filename}`, () =>{
-                    models.Posting.destroy({where: { id : idPosting }})
-                    .then(() => {res.status(200).json({'message' : "publication supprimée par l'utilisateur"})})
-                    .catch(() => res.status(500).json({ 'error': "erreur à la suppression de la publication" }))
+                        const filename = Posting.image.split('/images/')[1]; // suppression de l'ancienne image
+                        fs.unlink(`images/${filename}`, () =>{
+                        models.Posting.destroy({where: { id : idPosting }})
+                        .then(() => {res.status(200).json({'message' : "publication supprimée par l'utilisateur"})})
+                        .catch(() => res.status(500).json({ 'error': "erreur à la suppression de la publication" }))
                     })}
                     else{
                         models.Posting.destroy({where: { id : idPosting }})

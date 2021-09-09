@@ -23,7 +23,11 @@ module.exports = {
         },
       },
       commentId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Comments',
+          key: 'id'
+        },
       },
       createdAt: {
         allowNull: false,

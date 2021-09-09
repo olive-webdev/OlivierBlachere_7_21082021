@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       models.Report.belongsTo(models.Posting)
+      models.Report.belongsTo(models.Comment)
       models.Report.belongsTo(models.User)
     }
   };

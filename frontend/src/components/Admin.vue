@@ -2,7 +2,7 @@
   <h2>Liste des signalements des utilisateurs</h2>
   <hr>
   <div v-if="reports.length == 0" class="mt-5">Aucun signalement.</div>
-  <div class="alert alert-danger d-flex align-items-center justify-content-between py-0 text-black"
+  <div class="alert alert-danger d-flex align-items-center justify-content-between py-0 text-black shadow mb-4"
       v-for="report in reports" :key="report.id">{{ report.User.name }} {{ report.User.surname }}
       a signalé un post de {{ report.Posting.User.name }} {{ report.Posting.User.surname }}
       <router-link class="text-decoration-none text-danger fw-bold"  :to="{path:'/postfeed/', hash:'#post'+report.postingId}">
@@ -30,7 +30,7 @@ export default {
           .catch((error) =>{console.log(error)})
       },
       closeAlert(){
-
+        //todo
       },
     },
     beforeMount: function() {

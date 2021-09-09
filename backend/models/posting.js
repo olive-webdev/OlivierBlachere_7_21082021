@@ -10,8 +10,9 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      models.Posting.hasMany(models.Report)
-      models.Posting.hasMany(models.Like)
+      models.Posting.hasMany(models.Report, {onDelete: 'CASCADE', hooks: true,})
+      models.Posting.hasMany(models.Like, {onDelete: 'CASCADE', hooks: true,})
+      models.Posting.hasMany(models.Comment, {onDelete: 'CASCADE', hooks: true,})
       models.Posting.belongsTo(models.User)
     }
   };

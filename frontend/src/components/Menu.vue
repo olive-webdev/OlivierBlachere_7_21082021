@@ -3,22 +3,26 @@
       <div id="navigation" class="p-0 my-0 w-100">
         <router-link class="" to="/postfeed">
           <div class="d-flex justify-content-between align-items-center py-3 round-top" >
-            <div class="me-auto ms-3 d-none d-lg-block">Fil d'actualité</div>
+            <div class="me-auto ms-3 d-none d-lg-block">
+              <BIconJournalText class="fs-4 me-2"/>Fil d'actualité</div>
           </div>
         </router-link>
         <router-link class="" :to="{ name: 'Profil', params: { id: userId }}">
           <div class="d-flex justify-content-between align-items-center py-3" >
-            <div class="me-auto ms-3 d-none d-lg-block">Profil</div>
+            <div class="me-auto ms-3 d-none d-lg-block">
+              <BIconPersonSquare class="fs-4 me-2"/>Profil</div>
           </div>
         </router-link>
         <router-link v-if="$store.state.user.admin == true" class="" to="/administration">
           <div class=" d-flex justify-content-between align-items-center py-3" >
-            <div class="me-auto ms-3 d-none d-lg-block">Administration</div>
+            <div class="me-auto ms-3 d-none d-lg-block">
+              <BIconTools class="fs-4 me-2"/>Administration</div>
           </div>
         </router-link>
         <router-link @click="disconnect()" class="" to="/connexion">
           <div class="d-flex justify-content-between align-items-center py-3" >
-            <div  class="me-auto ms-3 d-none d-lg-block">Se déconnecter</div>
+            <div class="me-auto ms-3 d-none d-lg-block">
+              <BIconBoxArrowRight class="fs-4 me-2"/>Se déconnecter</div>
           </div>
         </router-link>
   </div>
