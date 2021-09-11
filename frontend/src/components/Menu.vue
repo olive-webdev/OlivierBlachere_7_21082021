@@ -1,8 +1,8 @@
 <template>
-    <div class="bg-white d-flex justify-content-center shadow round">
+    <div class="bg-white d-flex justify-content-center shadow rounded">
       <div id="navigation" class="p-0 my-0 w-100">
         <router-link class="" to="/postfeed">
-          <div class="d-flex justify-content-between align-items-center py-3 round-top" >
+          <div class="d-flex justify-content-between align-items-center py-3 rounded-top" >
             <div class="me-auto ms-3 d-none d-lg-block">
               <BIconJournalText class="fs-4 me-2"/>Fil d'actualité</div>
           </div>
@@ -40,11 +40,10 @@ export default {
   },
   methods:{
     disconnect(){
-      console.log("deconnexion en cours")
       localStorage.removeItem('token');
       localStorage.removeItem('userId');
       this.$store.dispatch('logout')
-      .then(() => { console.log(this.$store.state.user) })
+      .then(() => { console.log('utilisateur déconnecté') })
       .catch()
     }
   }
@@ -62,10 +61,6 @@ a:hover {
 #navigation .router-link-exact-active > div{
   background-color: rgb(235, 204, 204);
   border-left: 3px solid rgb(233, 68, 38);
-}
-
-.round-top{
-    border-radius: .6rem .6rem 0 0;
 }
 
 </style>

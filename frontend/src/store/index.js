@@ -52,7 +52,6 @@ export default createStore({
       })
     },
     getUser: ({commit}, userInfos) => {
-      console.log(userInfos)
       return new Promise((resolve, reject) => {
         instance.get('/users/' + userInfos.id, { headers: { Authorization: 'bearer ' + userInfos.token } })
         .then(function(response)

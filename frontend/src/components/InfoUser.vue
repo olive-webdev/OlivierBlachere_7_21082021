@@ -1,10 +1,10 @@
 <template>
-  <div v-if="userProfil.id != null" class="bg-white round d-flex pt-3 flex-column p-3 shadow">
+  <div v-if="userProfil.id != null" class="bg-white d-flex pt-3 flex-column p-3 shadow rounded">
       <div class="d-flex flex-column">
           <div class="d-flex">
               <div class="d-flex position-relative me-3">
-          <div class="photo round">
-            <img v-if="userProfil.Ppicture" class=" shadow" :src="userProfil.Ppicture"/>
+          <div class="photo border border-primary shadow rounded">
+            <img v-if="userProfil.Ppicture" class="" :src="userProfil.Ppicture"/>
             <img v-else class="" src="@/assets/defaultProfilPicture.jpeg"/>
             <BIconTrash @click="deletePhoto()" class="fs-2 pointer trash position-absolute"/>
             <BIconPencilSquare class="fs-2 change position-absolute"/>
@@ -18,22 +18,25 @@
           </li>
           <li :class="list">
             <div class="d-flex justify-content-start align-items-center w-100">
-              Nom : <div v-if="modifyToggle == false" class="ms-1">{{ userProfil.surname }}</div> <input v-if="modifyToggle == true"  type="text" name="" v-model="userProfil.surname">
+              <div class="flex-shrink-0 me-2">Nom :</div> <div v-if="modifyToggle == false" class="ms-1">{{ userProfil.surname }}</div>
+              <input v-if="modifyToggle == true"  type="text" class="form-control" name="" v-model="userProfil.surname">
             </div>
           </li>
           <li :class="list">
             <div class="d-flex justify-content-start align-items-center w-100">
-              Prénom : <div v-if="modifyToggle == false" class="ms-1">{{ userProfil.name }}</div> <input v-if="modifyToggle == true"  type="text" name="" v-model="userProfil.name">
+              <div class="flex-shrink-0 me-2">Prénom :</div> <div v-if="modifyToggle == false" class="ms-1">{{ userProfil.name }}</div>
+              <input v-if="modifyToggle == true"  type="text" class="form-control" name="" v-model="userProfil.name">
             </div>
           </li>
           <li :class="list">
             <div class="d-flex justify-content-start align-items-center w-100">
-              Service : <div v-if="modifyToggle == false" class="ms-1">{{ userProfil.service }}</div>
-                <select v-if="modifyToggle == true" class="form-select w" v-model="userProfil.service" aria-label="Default select example">
+              <div class="flex-shrink-0 me-2">Service :</div><div v-if="modifyToggle == false" class="ms-1">{{ userProfil.service }}</div>
+                <select v-if="modifyToggle == true" class="form-select" v-model="userProfil.service" aria-label="Default select example">
                     <option selected>{{ userProfil.service }}</option>
-                    <option value="Administration">Administration</option>
+                    <option class="bg-primary" value="Administration">Administration</option>
                     <option value="Commercial">Commercial</option>
                     <option value="Restauration">Restauration</option>
+                    <option value="Informatique">Informatique</option>
                     <option value="Marketing">Marketing</option>
                     <option value="Ressources Humaines">Ressources Humaines</option>
                     <option value="Logistique">Logistique</option>
@@ -42,7 +45,8 @@
           </li>
           <li :class="list">
             <div  class="d-flex justify-content-start align-items-center w-100">
-              Adresse Mail : <div v-if="modifyToggle == false" class="ms-1">{{ userProfil.email }}</div> <input v-if="modifyToggle == true"  type="text" name=""  v-model="userProfil.email">
+              <div class="flex-shrink-0 me-2">Adresse Mail :</div> <div v-if="modifyToggle == false" class="ms-1">{{ userProfil.email }}</div>
+              <input v-if="modifyToggle == true"  type="text" class="form-control" name=""  v-model="userProfil.email">
             </div>
           </li>
           <li :class="list">
@@ -52,12 +56,12 @@
           </div>
         
         <div v-if="userProfil.id == user || $store.state.user.admin == true" class="d-flex justify-content-end align-items-center py-3">
-            <button v-if="modifyToggle == false" @click="modifyProfil()" class="btn btng me-3 w-100">Modifier le profil</button>
-            <button v-if="modifyToggle == true" @click="saveNewProfil()" class="btn btng me-3 w-100 text-nowrap">Enregistrer les modifications</button>
+            <button v-if="modifyToggle == false" @click="modifyProfil()" class="btn btn-secondary border border-primary me-3 w-100">Modifier le profil</button>
+            <button v-if="modifyToggle == true" @click="saveNewProfil()" class="btn btn-secondary border border-primary me-3 w-100 text-nowrap">Enregistrer les modifications</button>
             <input @change="addPhoto()" type="file" ref="Ppicture" id="modifyPhoto" class="inputfile"/>
-            <button @click="modifyPhoto()" v-if="userProfil.id == user || $store.state.user.admin == true" class="btn btng me-3 w-100" for="modifyPhoto">Modifier la photo</button>
-            <button class="btn btng me-3 w-100" role="button" @click="modifyPassword()">Changer le mot de passe</button>
-            <button class="btn btng w-100" role="button" @click="deleteAccount()">Supprimer le compte</button>
+            <button @click="modifyPhoto()" v-if="userProfil.id == user || $store.state.user.admin == true" class="btn btn-secondary border border-primary me-3 w-100" for="modifyPhoto">Modifier la photo</button>
+            <button class="btn btn-secondary border border-primary me-3 w-100" role="button" @click="modifyPassword()">Changer le mot de passe</button>
+            <button class="btn btn-secondary border border-primary w-100" role="button" @click="deleteAccount()">Supprimer le compte</button>
         </div >
         <form v-if="passwordToggle == true" class="mt-4 w-50 align-self-center">
           <div class="my-3">
@@ -70,12 +74,12 @@
           </div>
           <p v-if="password.invalid" class="text-danger">Le mot de passe est invalide, il doit contenir au moins 8 caractères, des chiffres, des majuscules et minuscules.</p>
           <p v-if="password.nonEqual" class="text-danger">Les mots de passe ne correspondent pas. Vérifier votre saisie.</p>
-          <button @click="saveNewPassword" type="button" class="btn btng">Changer le mot de passe</button>
+          <button @click="saveNewPassword" type="button" class="btn btn-secondary border border-primary">Changer le mot de passe</button>
         </form>
         <div v-if="deleteToggle" class="mt-5 d-flex flex-column">
           <p class="fs-4">La suppression du compte est définitive et irréversible.</p>
-          <button type="button" @click="deleteAccount()" class="btn btng mb-3">Annuler</button>
-          <button type="button" @click="deletingAccount()" class="btn btngw mb-3">J'ai bien compris, je souhaite supprimer mon compte</button>
+          <button type="button" @click="deleteAccount()" class="btn btn-secondary border border-primary mb-3">Annuler</button>
+          <button type="button" @click="deletingAccount()" class="btn btn-light border border-primary mb-3">J'ai bien compris, je souhaite supprimer mon compte</button>
         </div>
             
       </div>
@@ -221,7 +225,6 @@ export default {
 .photo{
   width: 300px;
   height: 300px;
-  border: 2px rgb(233, 68, 38) solid;
 }
 .photo:hover > .trash{
   visibility: visible;
@@ -233,7 +236,6 @@ img{
   object-position: center;
   border-radius: .6rem;
 }
-
 .trash, .change{
     top: 1rem;
     visibility: hidden;
@@ -248,20 +250,22 @@ img{
 li{
     height: 4rem;;
 }
-.w{
-    width: 200px;
-}
 .btn{
   height: 60px;
 }
 .inputfile{
   display: none;
 }
-
+.dropdown-item.active {
+    background-color: red;
+}
 .btngw{
   background-color: none;
   border-radius: .6rem;
   border: 1px solid rgb(233, 68, 38);
   color: rgb(233, 68, 38);
+}
+select option[selected]{
+    background-color: rgb(235, 204, 204)
 }
 </style>

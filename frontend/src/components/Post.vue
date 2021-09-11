@@ -1,7 +1,7 @@
 <template>
-  <div class="bg-white round d-flex pt-3 flex-column p-4 mb-4 shadow">
+  <div class="bg-white rounded d-flex pt-3 flex-column p-4 mb-4 shadow">
     <div class="d-flex justify-content-between">
-      <img class="round borderG" src="" height="60" alt="" />
+      <img class="rounded borderG" src="" height="60" alt="" />
       <div class="me-auto ms-3 text-secondary">
         <h3 class="m-0 red">Prénom Nom</h3>
         <p class="text-start">Il y a 8 minutes</p>
@@ -36,7 +36,7 @@
       </p>
       <div class="">
         <div class="">
-          <img class="w-100 round mb-3" src="http://lorempixel.com/700/639" alt="" />
+          <img class="w-100 rounded mb-3" src="http://lorempixel.com/700/639" alt="" />
         </div>
       </div>
     </div>
@@ -51,8 +51,8 @@
     <div class="collapse" id="collapseExample">
     </div>
     <div class="d-flex position-relative">
-      <img class="round-start border-right-0 borderG border-end-0" src="https://i.pravatar.cc/60?img=1" />
-      <input class=" form-controlled border-start-0 w-100 round-end position-relative ps-5 borderG " 
+      <img class="rounded-start border-right-0 borderG border-end-0" src="https://i.pravatar.cc/60?img=1" />
+      <input class=" form-controlled border-start-0 w-100 rounded-end position-relative ps-5 borderG " 
       type="text" placeholder="Écrivez un commentaire..." />
     </div>
   </div>

@@ -5,7 +5,6 @@ const fs = require('fs');
 exports.createPosting = (req, res) => {
     const text   = req.body.text;
     const userId = req.body.userId;
-    console.log(req.file)
     if(req.file != undefined)
     {const image  = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
     models.Posting.create({ userId: userId, text: text, image: image })
@@ -30,7 +29,7 @@ exports.getAllPostings = (req, res) => {
     models.Posting.findAll(
         {include: [
             {model: models.User},
-            {model: models.Comment, include:[{model: models.Comment, include:[models.User]}, models.User]},
+            {model: models.Comment, include:[models.Like, models.Report, models.User, {model: models.Comment, include:[models.User, models.Like, models.Report]}]},
             {model: models.Like, include:[models.User]},
             {model: models.Report, include:[models.User]}
         ]}

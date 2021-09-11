@@ -1,6 +1,6 @@
 <template>
     <div class="d-flex justify-content-center">
-        <div id="login" class="bg-white round px-5 shadow mt-5 w-25">
+        <div id="login" class="bg-white rounded px-5 shadow mt-5 w-25">
             <img src="@/assets/icon.svg" height="150" alt="" class="mb-3" />
             <form @submit.prevent="">
                 <div v-if="status == 'errorLogin'" class="text-danger mb-4">Impossible de se connecter, vérifier votre email et votre mot de passe</div>
@@ -29,10 +29,10 @@
                     placeholder="Entrer votre mot de passe" />
                     <div v-if="!validPassword" class="form-text text-danger">Le mot de passe n'est pas valide, il doit comporter au moins 8 caractères dont un chiffre, des minuscules et majuscules</div>
                 </div>
-                <button v-if="toggle" :disabled="!validForm" type="submit" class="btng py-2 my-3 w-100" @click="login()">
+                <button v-if="toggle" :disabled="!validForm" type="submit" class="btn btn-secondary border-primary py-2 my-3 w-100" @click="login()">
                     <span v-if="status == 'connecting...'">Connection en cours</span><span v-else>Se connecter</span>
                 </button>
-                <button v-else :disabled="!validForm" type="submit" class="btng py-2 my-3 w-100" @click="signup()">S'inscrire</button>
+                <button v-else :disabled="!validForm" type="submit" class="btn btn-secondary border-primary py-2 my-3 w-100" @click="signup()">S'inscrire</button>
                 <p v-if="toggle" @click="switching()" class="mt-3 pointer">Pas encore de compte ?</p>
                 <p v-else @click="switching()" class="mt-3 pointer">Déjà enregistré ?</p>
             </form>
