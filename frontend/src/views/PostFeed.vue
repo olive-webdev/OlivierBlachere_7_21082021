@@ -1,13 +1,13 @@
 <template>
-  <div class="container bg-light px-md-4">
-    <Header class="sticky-top" />
-    <div class="row">
+  <div class="container bg-light px-md-4 px-1">
+    <Header class="sticky-top p-1" />
+    <div class="row mx-0">
       <div class="col-3 mt-3">
         <Menu class="d-none d-lg-block" />
       </div>
       <div class="col-lg-9 mt-3 col-12">
 <!-- AFFICHAGE QUOI DE NEUF -->
-        <div class="bg-white rounded d-flex flex-column px-md-4 py-md-3 mb-4 shadow mx-2">
+        <div class="bg-white rounded d-flex flex-column px-md-4 py-md-3 mb-4 border">
           <div class="d-flex input-group">
             <div class="thumbnailMD">
               <img v-if="$store.state.user.Ppicture" class="thumbnailMD border-end-0 border border-primary rounded-start" :src="$store.state.user.Ppicture"/>
@@ -48,9 +48,9 @@
         <ul id="postings">
 <!-- AFFICHAGE DU POST -->
           <li v-for="posting in postings" :key="posting.id" :id='"post"+posting.id'>
-            <div class="bg-white rounded d-flex pt-3 flex-column p-md-4 p-2 mb-4 shadow mx-2">
+            <div class="bg-white rounded d-flex pt-3 flex-column p-md-4 p-2 mb-4  border">
               <div class="d-flex justify-content-between border-bottom border-secondary pb-2">
-                <div class="rounded border border-primary shadow overflow-hidden">
+                <div class="rounded border border-primary overflow-hidden">
                   <img v-if="posting.User.Ppicture" class="thumbnail rounded " :src="posting.User.Ppicture" />
                   <img v-else class="thumbnail rounded " src="@/assets/defaultProfilPicture.jpeg"/>
                 </div>
@@ -60,13 +60,16 @@
                 </div>
                 <div v-if="posting.Reports.length > 0"><BIconExclamationSquareFill class="text-danger fs-4 me-3"/></div>
                 <div class="dropdown">
-                  <button type="button" class="btn-none" data-bs-toggle="dropdown" aria-expanded="false"><BIconInfoSquare class="fs-4 text-danger shadow"/></button>
+                  <button type="button" class="btn-none" data-bs-toggle="dropdown" aria-expanded="false"><BIconInfoSquare class="fs-4 text-danger"/></button>
                   <ul id="menuPost" class="dropdown-menu" aria-labelledby="menuPost">
                     <li>
-                      <div v-if="$store.state.user.userId != posting.User.id && !$store.state.user.admin" class="p-2 ps-3 pointer text-dark" @click="report(posting, to[0])">Signaler</div>
+                      <div v-if="$store.state.user.userId != posting.User.id && !$store.state.user.admin && posting.Reports.length == 0" class="p-2 ps-3 pointer text-dark" @click="report(posting, to[0])">Signaler</div>
                     </li>
                     <li>
-                      <div v-if="$store.state.user.admin" class="p-2 ps-3 pointer" @click="deleteReport(posting, to[0])">Retirer le signalement</div>
+                      <div v-if="$store.state.user.userId != posting.User.id && !$store.state.user.admin && posting.Reports.length > 0" class="p-2 ps-3 pointer text-dark" @click="report(posting, to[0])">Annuler le signalement</div>
+                    </li>
+                    <li>
+                      <div v-if="$store.state.user.admin && posting.Reports.length > 0" class="p-2 ps-3 pointer" @click="deleteReport(posting, to[0])">Retirer le signalement</div>
                     </li>
                     <li>
                       <div v-if="$store.state.user.userId == posting.User.id  || $store.state.user.admin" @click="modifyPost(posting)" class="p-2 ps-3 pointer">modifier</div>
@@ -124,41 +127,56 @@
 <!-- AFFICHAGE DES MESSAGES -->
               <div class="collapse" :id="'collapse'+posting.id"><hr>
                 <!-- BOUCLE POUR LES MESSAGES -->
-                <div v-for="comment in posting.Comments.slice().reverse()" :key="comment.createdAt">
-                      <div  class="d-flex align-items-start">
-                              <img v-if="comment.User.Ppicture == null" class="thumbnailSM rounded border border-primary me-2" src="@/assets/defaultProfilPicture.jpeg" alt="">
+                <div v-for="comment in posting.Comments" :key="comment.createdAt">
+                      <div  class="d-flex align-items-start" :id="'comment'+comment.id">
+                              <img v-if="comment.UserId == null" class="thumbnailSM rounded border border-primary me-2" src="@/assets/defaultProfilPicture.jpeg" alt="">
+                              <img v-else-if="comment.User.Ppicture == null" class="thumbnailSM rounded border border-primary me-2" src="@/assets/defaultProfilPicture.jpeg" alt="">
                               <img v-else :src="comment.User.Ppicture" alt="" class="thumbnailSM rounded border border-primary me-2">
                               <div :id="'comment'+comment.id" class="message mb-2 text-start pb-1 pointer">
-                                <span class="fw-bold">{{ comment.User.name }} {{ comment.User.surname }} : </span>
-                                <span class="text-start"> {{ comment.text }}</span>
+                                <div class="">
+                                  <div v-if="comment.Reports.length > 0"><BIconExclamationSquareFill class="text-danger fs-6 me-3 mb-1"/></div>
+                                  <span v-if="comment.UserId == null"><strong>utilisateur supprimé : </strong>{{ comment.text }}</span>
+                                  <span v-else><strong>{{ comment.User.name }} {{ comment.User.surname }} :</strong>  {{ comment.text }}</span>
+                                </div>
+                                <!-- AFFICHAGE OPTIONS MESSAGE HOVER -->
+                                <div id="message" class="justify-content-end align-items-center border-top">
+                                  <div class="me-auto" @click="like(comment, to[1])">
+                                    <BIconHandThumbsUp />
+                                    <span v-if="comment.Likes.length > 0" class="fs-6 me-2">{{ comment.Likes.length }}</span>
+                                  </div>
+                                  <span v-if="$store.state.user.admin && comment.Reports.length > 0"
+                                     class="ms-3 me-2" @click="deleteReport(comment, to[1])">retirer le signalement</span>
+                                  <span v-else-if="comment.UserId == null || $store.state.user.userId != comment.User.id && $store.state.user.admin == false"
+                                   class="ms-3 me-2" @click="report(comment, to[1])">signaler</span>
+                                  <span @click="answerComment(comment, posting)" class="me-2">répondre</span>
+                                  <span v-if="comment.UserId == null || $store.state.user.userId == comment.User.id || $store.state.user.admin" @click="deleteComment(comment)">supprimer</span>
+                                </div>
+                              </div>
+                      </div>
+<!-- BOUCLE POUR LES REPONSES DES MESSAGES -->
+                      <div v-for="comment in comment.Comments" :key="comment.createdAt">
+                        <div  class="d-flex align-items-start ms-5">
+                              <img v-if="comment.UserId == null" class="thumbnailSM rounded border border-primary me-2" src="@/assets/defaultProfilPicture.jpeg" alt="">
+                              <img v-else-if="comment.User.Ppicture == null" class="thumbnailSM rounded border border-primary me-2" src="@/assets/defaultProfilPicture.jpeg" alt="">
+                              <img v-else :src="comment.User.Ppicture" alt="" class="thumbnailSM rounded border border-primary me-2">
+                              <div :id="'comment'+comment.id" class="message mb-2 text-start pb-1 pointer">
+                                <div class="d-flex">
+                                  <div v-if="comment.Reports.length > 0"><BIconExclamationSquareFill class="text-danger fs-6 me-3 mb-1"/></div>
+                                  <span v-if="comment.UserId == null"><strong>utilisateur supprimé : </strong>{{ comment.text }}</span>
+                                  <span v-else><strong>{{ comment.User.name }} {{ comment.User.surname }} :</strong>  {{ comment.text }}</span>
+                                </div>
                                 <!-- AFFICHAGE OPTIONS MESSAGE HOVER -->
                                 <div id="message" class="justify-content-end align-items-center border-top">
                                   <div class="me-auto" @click="like(comment, to[1])">
                                     <BIconHandThumbsUp />
                                     <span v-if="comment.Likes.length > 0" class="fs-6">{{ comment.Likes.length }}</span>
                                   </div>
-                                  <span class="ms-3 me-2">signaler</span>
-                                  <span @click="answerComment(comment, posting)" class="me-2">répondre</span>
-                                  <span v-if="$store.state.user.userId == comment.User.id || $store.state.user.admin" @click="deleteComment(comment)">supprimer</span>
-                                </div>
-                              </div>
-                      </div>
-                      <!-- BOUCLE POUR LES REPONSES DES MESSAGES -->
-                      <div v-for="comment in comment.Comments.slice().reverse()" :key="comment.createdAt">
-                        <div  class="d-flex align-items-start ms-5">
-                              <img v-if="comment.User.Ppicture == null" class="thumbnailSM rounded border border-primary me-2" src="@/assets/defaultProfilPicture.jpeg" alt="">
-                              <img v-else :src="comment.User.Ppicture" alt="" class="thumbnailSM rounded border border-primary me-2">
-                              <div :id="'comment'+comment.id" class="message mb-2 text-start pb-1 pointer">
-                                <span class="fw-bold">{{ comment.User.name }} {{ comment.User.surname }} : </span>
-                                <span class="text-start"> {{ comment.text }}</span>
-                                <!-- AFFICHAGE OPTIONS MESSAGE HOVER -->
-                                <div id="message" class="justify-content-end align-items-center border-top">
-                                  <div class="me-auto" @click="like(comment)">
-                                    <BIconHandThumbsUp />
-                                    <span v-if="comment.Likes.length > 0" class="fs-6">{{ comment.Likes.length }}</span>
-                                  </div>
-                                  <span class="ms-3 me-2">signaler</span>
-                                  <span v-if="$store.state.user.userId == comment.User.id || $store.state.user.admin" @click="deleteComment(comment)">supprimer</span>
+                                  <span v-if="$store.state.user.admin && comment.Reports.length > 0"
+                                     class="ms-3 me-2" @click="deleteReport(comment, to[1])">retirer le signalement</span>
+                                  <span v-else-if="comment.UserId == null || $store.state.user.userId != comment.User.id && $store.state.user.admin == false"
+                                   class="ms-3 me-2" @click="report(comment, to[1])">signaler</span>
+                                  <span v-if="comment.UserId == null || $store.state.user.userId == comment.User.id || $store.state.user.admin"
+                                   @click="deleteComment(comment)">supprimer</span>
                                 </div>
                               </div>
                         </div>
@@ -273,6 +291,7 @@ export default {
       }
     },
     getAllPost(){
+      this.loading = true;
       axios.get('http://localhost:3000/postings/', { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
       .then((response)=>{this.postings = response.data.slice().reverse(); this.comments = response.data.Comments; console.log(response.data)})
       .catch((error) =>{console.log(error)})
@@ -321,7 +340,6 @@ export default {
     },
     modifyPost(posting){
       posting.toggle = !posting.toggle
-      console.log(posting)
     },
     like(from, to){
       console.log("un ptit like", from)
@@ -330,7 +348,7 @@ export default {
       .catch((error) =>{console.log(error)})
     },
     report(from, to){
-      console.log("signalement du post")
+      console.log("signalement")
       axios.post('http://localhost:3000/reports/'+to+'/'+from.id, {userId :localStorage.getItem('userId')}, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
       .then(() => this.getAllPost())
       .catch((error) =>{console.log(error)})
@@ -356,7 +374,7 @@ export default {
       }
     },
     deleteComment(comment){
-      axios.delete('http://localhost:3000/comments/by/'+comment.User.id+'/'+comment.id, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
+      axios.delete('http://localhost:3000/comments/by/'+comment.UserId+'/'+comment.id, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
       .then(()=>{this.getAllPost()})
       .catch((error) =>{console.log(error)})
     },
@@ -491,4 +509,75 @@ ul{
   padding: .5rem;
   background-color: white;
 }
+
+.conteneur_general_load_10{overflow:hidden;width:145px;height:85px}
+.cle_bleu_load_10{
+  border-radius:50px;
+  width:50px;
+  height:50px;
+  border-top:10px solid #EBCCCC;
+  border-right:10px solid #E94426;
+  border-bottom:10px solid #EBCCCC;
+  border-left:10px solid #E94426;
+  -webkit-animation:load_dix 1.4s infinite linear;
+  -moz-animation:load_dix 1.4s infinite linear;
+  -ms-animation:load_dix 1.4s infinite linear;
+  -o-animation:load_dix 1.4s infinite linear;
+  animation:load_dix 1.4s infinite linear}
+  
+@-webkit-keyframes load_dix{
+  0%{-webkit-transform:rotate(0deg);
+  -moz-transform:rotate(0deg);
+  -ms-transform:rotate(0deg);
+  transform:rotate(0deg)}
+  50%{-webkit-transform:rotate(360deg);
+  -moz-transform:rotate(360deg);
+  -ms-transform:rotate(360deg);
+  transform:rotate(360deg)}
+  100%{-webkit-transform:rotate(720deg);
+  -moz-transform:rotate(720deg);
+  -ms-transform:rotate(720deg);
+  transform:rotate(720deg)}}
+  
+@-moz-keyframes load_dix{
+  0%{-webkit-transform:rotate(0deg);
+  -moz-transform:rotate(0deg);
+  -ms-transform:rotate(0deg);
+  transform:rotate(0deg)}
+  50%{-webkit-transform:rotate(360deg);
+  -moz-transform:rotate(360deg);
+  -ms-transform:rotate(360deg);
+  transform:rotate(360deg)}
+  100%{-webkit-transform:rotate(720deg);
+  -moz-transform:rotate(720deg);
+  -ms-transform:rotate(720deg);
+  transform:rotate(720deg)}}
+  
+@-ms-keyframes load_dix{
+  0%{-webkit-transform:rotate(0deg);
+  -moz-transform:rotate(0deg);
+  -ms-transform:rotate(0deg);
+  transform:rotate(0deg)}
+  50%{-webkit-transform:rotate(360deg);
+  -moz-transform:rotate(360deg);
+  -ms-transform:rotate(360deg);
+  transform:rotate(360deg)}
+  100%{-webkit-transform:rotate(720deg);
+  -moz-transform:rotate(720deg);
+  -ms-transform:rotate(720deg);
+  transform:rotate(720deg)}}
+  
+@keyframes load_dix{
+  0%{-webkit-transform:rotate(0deg);
+  -moz-transform:rotate(0deg);
+  -ms-transform:rotate(0deg);
+  transform:rotate(0deg)}
+  50%{-webkit-transform:rotate(360deg);
+  -moz-transform:rotate(360deg);
+  -ms-transform:rotate(360deg);
+  transform:rotate(360deg)}
+  100%{-webkit-transform:rotate(720deg);
+  -moz-transform:rotate(720deg);
+  -ms-transform:rotate(720deg);
+  transform:rotate(720deg)}}
 </style>

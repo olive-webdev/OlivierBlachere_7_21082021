@@ -1,11 +1,11 @@
 <template>
-  <div class="container bg-light px-4 vh-100">
-    <Header  />
-    <div class="row">
+  <div class="container bg-light px-1 px-md-4 vh-100">
+    <Header class="sticky-top p-1" />
+    <div class="row mx-0">
       <div class="col-3 mt-3">
-        <Menu />
+        <Menu class="d-none d-lg-block"/>
       </div>
-      <div class="col-9 mt-3">
+      <div class="col-lg-9 mt-3 col-12">
         <InfoUser />
       </div>
     </div>

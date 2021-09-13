@@ -1,11 +1,11 @@
 <template>
-  <div class="container bg-light px-4 vh-100">
-    <Header  />
-    <div class="row">
+  <div class="container bg-light px-md-4 px-1 vh-100">
+    <Header class="p-1 sticky-top" />
+    <div class="row mx-0">
       <div class="col-3 mt-3">
-        <Menu />
+        <Menu class="d-none d-lg-block"/>
       </div>
-      <div class="col-9 mt-3">
+      <div class="col-lg-9 col-12 mt-3">
         <Admin />
       </div>
     </div>
@@ -24,8 +24,7 @@ export default {
       router: useRouter(),
     }
   },
-
-   beforeMount: function(){
+  beforeMount: function(){
     if(!this.$store.state.user.token && !localStorage.getItem('token')){
       this.$router.push("/connexion")
       console.log("utilisateur non connecté")
