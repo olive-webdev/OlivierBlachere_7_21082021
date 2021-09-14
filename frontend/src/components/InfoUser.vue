@@ -116,7 +116,6 @@ export default {
                 name: res.data.name, service: res.data.service, email: res.data.email,
                 Ppicture: res.data.Ppicture, creation: res.data.createdAt.slice(0,10),
                 };
-                console.log(this.userProfil)
             })
             .catch((json) => console.log(json));
         },

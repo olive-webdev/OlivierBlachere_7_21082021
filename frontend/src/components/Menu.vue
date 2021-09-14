@@ -18,7 +18,7 @@
       <router-link v-if="$store.state.user.admin == true" class="" to="/administration">
         <div class=" d-flex justify-content-between align-items-center py-3" >
           <div class="me-auto px-3">
-            <BIconTools class="fs-4 me-2"/>Administration
+            <BIconTools class="fs-4 me-2"/>Administration<span v-if="$store.state.reports >0" class="ms-1 badge bg-secondary border border-primary text-end text-dark">{{$store.state.reports}}</span>
           </div>
         </div>
       </router-link>
@@ -39,9 +39,15 @@ export default {
   data(){
     return{
       userId: localStorage.getItem('userId'),
+      reports: Number,
     }
   },
   methods:{
+    getReports(){
+      this.$store.dispatch('reports')
+      .then(console.log(this.$store.state.reports+'signalement(s)'))
+      .catch(function (error){console.log(error)})
+    },
     disconnect(){
       localStorage.removeItem('token');
       localStorage.removeItem('userId');
@@ -49,7 +55,8 @@ export default {
       .then(() => { console.log('utilisateur déconnecté') })
       .catch()
     }
-  }
+  },
+  beforeMount(){this.getReports()},
 }
 </script>
 

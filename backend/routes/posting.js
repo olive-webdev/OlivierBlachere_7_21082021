@@ -4,7 +4,6 @@ const postingCtrl = require('../controllers/posting');
 const auth        = require('../middleware/auth');
 const multer        = require('../middleware/multer')
 
-
 router.get('/',                     auth, postingCtrl.getAllPostings);
 router.get('/by/:id',               auth, postingCtrl.getAllPostingsBy);
 router.get('/:id',                  auth, postingCtrl.getOnePosting);

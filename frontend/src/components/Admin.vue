@@ -1,7 +1,7 @@
 <template>
   <h2>Liste des signalements des utilisateurs</h2>
   <hr>
-  <div v-if="reports.length == 0" class="mt-5">Aucun signalement.</div>
+  <div v-if="reports.length == 0" class="mt-5 text-center">Aucun signalement.</div>
     <div class="alert bg-secondary d-flex align-items-center justify-content-between py-0 text-black shadow mb-4 position-relative"
       v-for="report in reports" :key="report.id">
       <div v-if="report.Posting != null" class="d-flex  flex-column justify-content-between align-items-center py-3 w-100">
@@ -36,14 +36,19 @@ export default {
       }
   },
   methods:{
+    getReports(){
+      this.$store.dispatch('reports')
+      .then(function (){console.log('récuprération des signalements')})
+      .catch(function (error){console.log(error)})
+    },
     getAllReports(){
         axios.get('http://localhost:3000/reports/', { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
-        .then((response)=>{this.reports = response.data; console.log(this.reports)})
+        .then((response)=>{this.reports = response.data})
         .catch((error) =>{console.log(error)})
     },
     closeAlert(from, to){
     axios.delete('http://localhost:3000/reports/'+to+'/'+from.id, { headers: { Authorization: 'bearer ' + localStorage.getItem('token')}})
-    .then(() => {console.log('signalement supprimé');this.getAllReports()})
+    .then(() => {console.log('signalement supprimé');this.getReports();this.getAllReports()})
     .catch((error) =>{console.log(error)})
     },
   },

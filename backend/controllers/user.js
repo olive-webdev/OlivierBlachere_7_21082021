@@ -11,13 +11,12 @@ exports.signup = (req, res) => {
     const name     = req.body.name;
     const surname  = req.body.surname;
 
-
     models.User.findOne({ //on cherche dans la base de données si l'utilisateur existe déjà
         attributes: ['email'],
         where: { email: email }
     })
     .then((User) => {
-        if(User){ //utiliser findOrCreate //gestion des erreurs
+        if(User){
             return res.status(409).json({ 'error': 'utilisateur déjà existant'});
         }
         else if(name == undefined || name == "") {
@@ -70,13 +69,13 @@ exports.login = (req, res) => {
     .catch(() => res.status(400).json({ error: "utilisateur introuvable" }));
 };
 
-exports.getAllUsers = (req, res) => {
+exports.getAllUsers = (req, res) => { //renvoie un tableau de tous les utilisateurs
     models.User.findAll()
     .then((Users) => res.status(200).json(Users))
     .catch(() => res.status(500).json({ 'error': "Pas encore d'utilisateur" }));
 };
 
-exports.getOneUser = (req, res) => {
+exports.getOneUser = (req, res) => { //renvoie les information d'un utilisateur
     const id = req.params.id;
     models.User.findOne({
         where: { id: id }
@@ -91,7 +90,6 @@ exports.getOneUser = (req, res) => {
 
 exports.modifyUser = (req, res) => {
     const id = req.params.id;
-    console.log(id);
     const token = req.headers.authorization.split(' ')[1];
     const decodedToken = jwt.verify(token, "privateKey");
     const userId = decodedToken.userId;
@@ -149,7 +147,6 @@ exports.modifyUser = (req, res) => {
 
 exports.modifyPhoto = (req, res) => {
     const id = req.params.id;
-    console.log(id);
     const token = req.headers.authorization.split(' ')[1];
     const decodedToken = jwt.verify(token, "privateKey");
     const userId = decodedToken.userId;
@@ -255,7 +252,6 @@ exports.deletePhoto = (req, res) => {
         .then((User) => {
             if(User === null){res.status(500).json({ 'error': "pas d'utilisateur trouvé" })}
             else{
-                console.log(User.Ppicture)
                 const filename = User.Ppicture.split('/images/')[1]; // suppression de l'ancienne image
                 fs.unlink(`./images/${filename}`, () => {
                 User.Ppicture = null;
@@ -304,15 +300,9 @@ exports.deleteUser = (req, res) => {
         .catch(() => res.status(500).json({ 'error': "vous n'avez pas les droits pour effectuer cette opération"}))}
 
     else{
-        // models.Posting.destroy(
-        //     {where: {UserId : id}}
-        // )
-        // .then(() => {
-            models.User.destroy(
-                {where: { id : id }}
-            )
-            .then(() => res.status(200).json({'message' : "compte utilisateur supprimé par l'utilisateur"}))
-            .catch((error) => res.status(500).json(error));
-        // })
-        // .catch(() => res.status(500).json({ 'error': "erreur à la suppression des messages" }));}
+        models.User.destroy(
+            {where: { id : id }}
+        )
+        .then(() => res.status(200).json({'message' : "compte utilisateur supprimé par l'utilisateur"}))
+        .catch((error) => res.status(500).json(error));
 }};

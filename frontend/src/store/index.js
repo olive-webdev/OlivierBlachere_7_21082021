@@ -19,6 +19,7 @@ export default createStore({
       creation: null,
       auth: true,
     },
+    reports: Number,
   },
   mutations: {
     setStatus: function(state, status){state.status = status},
@@ -28,6 +29,8 @@ export default createStore({
     logout: function(state, value){state.user.userId = value},
     modifyProfil: function(state, value){state.user = value},
     changePhoto: function(state, userProfil){state.user.Ppicture = userProfil.Ppicture},
+    reports: function(state, value){state.reports = value},
+    deleteReport: function(state){state.reports--},
   },
   actions: {
     signup: ({commit}, userInfos) =>  {
@@ -71,7 +74,15 @@ export default createStore({
         .catch(function(error){commit('setStatus', 'errorModifyingProfil');reject(error)})
       })
     },
+    reports: ({commit}) => {
+      return new Promise((resolve, reject) => {
+        instance.get('/reports/', { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
+        .then(function(response){commit('reports', response.data.length); resolve(response)})
+        .catch(function(error){commit('reports', 'errorGetReports');reject(error)})
+      })
+    },
+    deleteReport: ({commit}) => {
+      commit('deleteReport')
+    }
   },
-  modules: {
-  }
 })

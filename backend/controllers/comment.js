@@ -1,7 +1,6 @@
 const models = require("../models/");
 const jwt = require('jsonwebtoken');
 
-
 exports.createComment = (req, res) => {
     const text   = req.body.text;
     const userId = req.body.userId;
@@ -20,7 +19,6 @@ exports.deleteComment = (req, res) => {
     const token        = req.headers.authorization.split(' ')[1];
     const decodedToken = jwt.verify(token, "privateKey");
     const userId       = decodedToken.userId;
-    console.log(id, userId)
     if(userId != id){
         models.User.findOne({
             where: { id : userId }

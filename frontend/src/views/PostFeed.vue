@@ -251,6 +251,11 @@ export default {
   },
   methods:{
     send(){
+      console.log(this.text, document.getElementById('addingPhoto').value)
+      if(this.text == '' && document.getElementById('addingPhoto').value == ''){
+        console.log('il faut remplir au moins le champs texte ou insérer une image')
+      }
+      else{
       let formData = new FormData();
       if(document.getElementById('addingPhoto').value != null){
         formData.append('image', document.getElementById('addingPhoto').files[0])}
@@ -260,6 +265,7 @@ export default {
         axios.post('http://localhost:3000/postings/', formData, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
         .then(()=>{this.text = ''; this.image = null; this.url= ''; document.getElementById('addingPhoto').value = null; this.getAllPost()})
         .catch((error) =>{console.log(error)})
+      }
     },
     modifyPosting(posting){
       let formData = new FormData();
@@ -355,7 +361,7 @@ export default {
     },
     deleteReport(from, to){
       axios.delete('http://localhost:3000/reports/'+to+'/'+from.id, { headers: { Authorization: 'bearer ' + localStorage.getItem('token')}})
-      .then(() => this.getAllPost())
+      .then(() => {this.$store.commit('deleteReport');this.getAllPost()})
       .catch((error) =>{console.log(error)})
     },
     sendComment(posting){

@@ -14,12 +14,9 @@
     "bootstrap-icons-vue": "^0.7.0",
     "core-js": "^3.6.5",
     "email-validator": "^2.0.4",
-    "emoji-picker-element": "^1.8.0",
     "password-validator": "^5.1.1",
     "vue": "^3.0.0",
-    "vue-emoji-picker": "^1.0.3",
     "vue-router": "^4.0.0-0",
-    "vuemoji-picker": "0.0.7",
     "vuex": "^4.0.0-0"
   },
   "devDependencies": {
