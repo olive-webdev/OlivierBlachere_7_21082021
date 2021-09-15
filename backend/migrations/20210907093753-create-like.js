@@ -14,6 +14,8 @@ module.exports = {
           model: 'Users',
           key: 'id'
         },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       postingId: {
         type: Sequelize.INTEGER,
@@ -21,6 +23,8 @@ module.exports = {
           model: 'Postings',
           key: 'id'
         },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       commentId: {
         type: Sequelize.INTEGER,
@@ -28,6 +32,8 @@ module.exports = {
           model: 'Comments',
           key: 'id'
         },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       createdAt: {
         allowNull: false,

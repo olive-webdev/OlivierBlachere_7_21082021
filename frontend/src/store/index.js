@@ -19,7 +19,7 @@ export default createStore({
       creation: null,
       auth: true,
     },
-    reports: Number,
+    reports: 0,
   },
   mutations: {
     setStatus: function(state, status){state.status = status},

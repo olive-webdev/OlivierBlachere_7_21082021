@@ -83,7 +83,6 @@ exports.getOneUser = (req, res) => { //renvoie les information d'un utilisateur
     .then((User) => {
         if(User === null){res.status(500).json({ 'error': "pas d'utilisateur trouvé" })}
         else{res.status(200).json(User)}
-        
     })
     .catch(() => res.status(500).json({ 'error': "pas d'utilisateur trouvé" }));
 };
@@ -93,56 +92,26 @@ exports.modifyUser = (req, res) => {
     const token = req.headers.authorization.split(' ')[1];
     const decodedToken = jwt.verify(token, "privateKey");
     const userId = decodedToken.userId;
-    if(userId != id){
-        models.User.findOne({
-            where: { id : userId }
-            })
-        .then((User) => {
-            if(User.admin === true){
-                models.User.findOne({
-                    where: { id: id }
-                    })
-                    .then((User) => {
-                        if(User === null){res.status(500).json({ 'error': "pas d'utilisateur trouvé" })}
-                        else{
-                            User.name = req.body.name;
-                            User.surname = req.body.surname;
-                            User.service = req.body.service;
-                            User.email = req.body.email;
-                            bcrypt.hash(req.body.password, 2, function(err, bcryptedPassword){
-                                User.password = bcryptedPassword;
-                                User.save();
-                            });
-                            res.status(200).json({ 'message': "données de l'utilisateur modifié par l'administrateur"});
-                        }
-                    })
-                    .catch(() => res.status(500).json({ 'error': "pas d'utilisateur trouvé" }));
-            }
-            else{
-                res.status(500).json({ 'error': "vous devez être administrateur pour effectuer cette opération"});}
-        })
-        .catch(() => res.status(500).json({ 'error': "vous n'avez pas les droits pour effectuer cette opération"}))
-    }
-    else{
-        models.User.findOne({
-        where: { id: id }
-        })
-        .then((User) => {
-            if(User === null){res.status(500).json({ 'error': "pas d'utilisateur trouvé" })}
-            else{
-                User.name = req.body.name;
-                User.surname = req.body.surname;
-                User.service = req.body.service;
-                User.email = req.body.email;
-                bcrypt.hash(req.body.password, 2, function(err, bcryptedPassword){
-                    User.password = bcryptedPassword;
-                    User.save();
-                });
-                res.status(200).json({ 'message': "données de l'utilisateur modifié"});
-            }
-        })
-        .catch(() => res.status(500).json({ 'error': "impossible de mettre à jour" }));
-    }
+    models.User.findOne({where: {id : userId}})
+    .then((User) => {
+        let administrator = User.admin ? true : false;
+        if(userId == id || administrator === true){
+            models.User.findOne({where: { id: id }})
+                .then((User) => {
+                    if(User === null){res.status(500).json({ 'error': "pas d'utilisateur trouvé" })}
+                    else{
+                        User.name = req.body.name;
+                        User.surname = req.body.surname;
+                        User.service = req.body.service;
+                        User.email = req.body.email;
+                        bcrypt.hash(req.body.password, 2, function(err, bcryptedPassword){User.password = bcryptedPassword;User.save()});
+                        res.status(200).json({ 'message': "données de l'utilisateur modifiées"});
+                    }
+                })
+                .catch(() => res.status(500).json({ 'error': "erreur à la modification des données utilisateur" }));
+        }
+        else{res.status(500).json({ 'error': "vous n'avez pas les droits pour effectuer cette opération" })}})
+    .catch((error) => console.log(error))
 };
 
 exports.modifyPhoto = (req, res) => {
@@ -162,17 +131,25 @@ exports.modifyPhoto = (req, res) => {
                     .then((User) => {
                         if(User === null){res.status(500).json({ 'error': "pas d'utilisateur trouvé" })}
                         else{
-                            const filename = User.Ppicture.split('/images/')[1];
-                            fs.unlink(`images/${filename}`, (err) => {
-                                if (err) {
-                                    console.log("impossible de supprimer l'image:"+err);
-                                } else {
-                                    console.log('image supprimée');                                
-                                }})
-                            User.Ppicture = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
-                            User.save()
-                            .then(()=>{res.status(200).json({ 'message': "données de l'utilisateur modifié par l'utilisateur"});})
-                            .catch(()=>{res.status(500).json({ 'error': "impossible de modifier la photo" })})
+                            if(User.Ppicture === null){
+                                User.Ppicture = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+                                User.save()
+                                .then(()=>{res.status(200).json({ 'message': "données de l'utilisateur modifié par l'utilisateur"});})
+                                .catch(()=>{res.status(500).json({ 'error': "impossible de modifier la photo" })})
+                            }
+                            else{
+                                const filename = User.Ppicture.split('/images/')[1];
+                                fs.unlink(`images/${filename}`, (err) => {
+                                    if (err) {
+                                        console.log("impossible de supprimer l'image:"+err);
+                                    } else {
+                                        console.log('image supprimée');                                
+                                    }})
+                                User.Ppicture = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+                                User.save()
+                                .then(()=>{res.status(200).json({ 'message': "données de l'utilisateur modifié par l'utilisateur"});})
+                                .catch(()=>{res.status(500).json({ 'error': "impossible de modifier la photo" })})
+                            }
                         }
                     })
                     .catch(() => res.status(500).json({ 'error': "pas d'utilisateur trouvé" }));

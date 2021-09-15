@@ -18,7 +18,6 @@
         </div>
       </div>
           <Menu v-if="menu" class="position-absolute position z d-lg-none"/>
-
     </div>
 
 </template>
@@ -48,7 +47,7 @@ components: {
   right: 0rem;
 }
 .z{
-  width: 180px;
+  width: 200px;
   z-index: 2000;
 }
 </style>

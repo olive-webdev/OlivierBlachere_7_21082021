@@ -27,7 +27,7 @@
             </button>
           </div>
           <div v-if="emoji" id="emoji">
-            <ul class="d-flex fs-3 mb-0 mt-2 flex-wrap">
+            <ul class="d-flex fs-3 mb-0 p-3 pb-0 flex-wrap">
               <li @click="addEmoji(emojiList)" class="mx-1 pointer" v-for="emojiList in emojiLists" :key="emojiList">{{emojiList}}</li>
             </ul>
           </div>
@@ -50,9 +50,9 @@
           <li v-for="posting in postings" :key="posting.id" :id='"post"+posting.id'>
             <div class="bg-white rounded d-flex pt-3 flex-column p-md-4 p-2 mb-4  border">
               <div class="d-flex justify-content-between border-bottom border-secondary pb-2">
-                <div class="rounded border border-primary overflow-hidden">
-                  <img v-if="posting.User.Ppicture" class="thumbnail rounded " :src="posting.User.Ppicture" />
-                  <img v-else class="thumbnail rounded " src="@/assets/defaultProfilPicture.jpeg"/>
+                <div class="rounded border border-primary overflow-hidden thumbnail rounded">
+                  <img v-if="posting.User.Ppicture" class="thumbnail" :src="posting.User.Ppicture" />
+                  <img v-else class="thumbnail" src="@/assets/defaultProfilPicture.jpeg"/>
                 </div>
                 <div class="me-auto ms-3 text-primary">
                   <h3 class="m-0 text-start">{{posting.User.name}} {{posting.User.surname}}</h3>
@@ -127,12 +127,12 @@
 <!-- AFFICHAGE DES MESSAGES -->
               <div class="collapse" :id="'collapse'+posting.id"><hr>
                 <!-- BOUCLE POUR LES MESSAGES -->
-                <div v-for="comment in posting.Comments" :key="comment.createdAt">
+                <div v-for="comment in posting.Comments.slice().reverse()" :key="comment.createdAt">
                       <div  class="d-flex align-items-start" :id="'comment'+comment.id">
                               <img v-if="comment.UserId == null" class="thumbnailSM rounded border border-primary me-2" src="@/assets/defaultProfilPicture.jpeg" alt="">
                               <img v-else-if="comment.User.Ppicture == null" class="thumbnailSM rounded border border-primary me-2" src="@/assets/defaultProfilPicture.jpeg" alt="">
                               <img v-else :src="comment.User.Ppicture" alt="" class="thumbnailSM rounded border border-primary me-2">
-                              <div :id="'comment'+comment.id" class="message mb-2 text-start pb-1 pointer">
+                              <div :id="'commentText'+comment.id" class="message mb-2 text-start pb-1 pointer">
                                 <div class="">
                                   <div v-if="comment.Reports.length > 0"><BIconExclamationSquareFill class="text-danger fs-6 me-3 mb-1"/></div>
                                   <span v-if="comment.UserId == null"><strong>utilisateur supprimé : </strong>{{ comment.text }}</span>
@@ -154,7 +154,7 @@
                               </div>
                       </div>
 <!-- BOUCLE POUR LES REPONSES DES MESSAGES -->
-                      <div v-for="comment in comment.Comments" :key="comment.createdAt">
+                      <div v-for="comment in comment.Comments.slice().reverse()" :key="comment.createdAt">
                         <div  class="d-flex align-items-start ms-5">
                               <img v-if="comment.UserId == null" class="thumbnailSM rounded border border-primary me-2" src="@/assets/defaultProfilPicture.jpeg" alt="">
                               <img v-else-if="comment.User.Ppicture == null" class="thumbnailSM rounded border border-primary me-2" src="@/assets/defaultProfilPicture.jpeg" alt="">
@@ -222,6 +222,7 @@ import Header from "../components/Header.vue";
 import Menu from "../components/Menu.vue";
 import { useRouter } from "vue-router";
 const axios = require("axios").default;
+const instance = axios.create({baseURL: 'http://localhost:3000'})
 export default {
   name: "PostFeed",
   components: {
@@ -251,7 +252,6 @@ export default {
   },
   methods:{
     send(){
-      console.log(this.text, document.getElementById('addingPhoto').value)
       if(this.text == '' && document.getElementById('addingPhoto').value == ''){
         console.log('il faut remplir au moins le champs texte ou insérer une image')
       }
@@ -260,9 +260,8 @@ export default {
       if(document.getElementById('addingPhoto').value != null){
         formData.append('image', document.getElementById('addingPhoto').files[0])}
       else{formData.append('image', null)}
-        formData.append('text', this.text)
-        formData.append('userId', localStorage.getItem('userId'))
-        axios.post('http://localhost:3000/postings/', formData, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
+        formData.append('text', this.text); formData.append('userId', localStorage.getItem('userId'))
+        instance.post('/postings/', formData, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
         .then(()=>{this.text = ''; this.image = null; this.url= ''; document.getElementById('addingPhoto').value = null; this.getAllPost()})
         .catch((error) =>{console.log(error)})
       }
@@ -275,7 +274,7 @@ export default {
         formData.append('image', this.image)
         formData.append('text', document.getElementById("textModified").value)
         formData.append('userId', localStorage.getItem('userId'))
-        axios.put('http://localhost:3000/postings/by/' +posting.UserId+ "/" + posting.id , formData, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
+        instance.put('/postings/by/' +posting.UserId+ "/" + posting.id , formData, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
         .then(()=>{this.getAllPost()})
         .catch((error) =>{console.log(error)})}
       else {
@@ -283,7 +282,7 @@ export default {
           console.log("image supprimée")
           formData.append('text', document.getElementById("textModified").value)
           formData.append('userId', localStorage.getItem('userId'))
-          axios.put('http://localhost:3000/postings/by/' +posting.UserId+ "/" + posting.id , formData, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
+          instance.put('/postings/by/' +posting.UserId+ "/" + posting.id , formData, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
           .then(()=>{this.getAllPost();this.emoji = false; this.photo = false;})
           .catch((error) =>{console.log(error)})}
         else{
@@ -291,19 +290,19 @@ export default {
           formData.append('image', 'noChange')
           formData.append('text', document.getElementById("textModified").value)
           formData.append('userId', localStorage.getItem('userId'))
-          axios.put('http://localhost:3000/postings/by/' +posting.UserId+ "/" + posting.id , formData, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
+          instance.put('/postings/by/' +posting.UserId+ "/" + posting.id , formData, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
           .then(()=>{this.getAllPost();this.emoji = false; this.photo = false;})
           .catch((error) =>{console.log(error)})}
       }
     },
     getAllPost(){
       this.loading = true;
-      axios.get('http://localhost:3000/postings/', { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
+      instance.get('/postings/', { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
       .then((response)=>{this.postings = response.data.slice().reverse(); this.comments = response.data.Comments; console.log(response.data)})
       .catch((error) =>{console.log(error)})
     },
     deletePost(id, user){
-      axios.delete('http://localhost:3000/postings/by/' + user + "/" + id, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
+      instance.delete('/postings/by/' + user + "/" + id, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
       .then(()=>{this.getAllPost()})
       .catch((error) =>{console.log(error)})
     },
@@ -348,27 +347,25 @@ export default {
       posting.toggle = !posting.toggle
     },
     like(from, to){
-      console.log("un ptit like", from)
-      axios.post('http://localhost:3000/likes/'+to+'/'+from.id, {userId :localStorage.getItem('userId')}, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
+      instance.post('/likes/'+to+'/'+from.id, {userId :localStorage.getItem('userId')}, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
       .then(() => this.getAllPost())
       .catch((error) =>{console.log(error)})
     },
     report(from, to){
-      console.log("signalement")
-      axios.post('http://localhost:3000/reports/'+to+'/'+from.id, {userId :localStorage.getItem('userId')}, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
+      instance.post('/reports/'+to+'/'+from.id, {userId :localStorage.getItem('userId')}, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
       .then(() => this.getAllPost())
       .catch((error) =>{console.log(error)})
     },
     deleteReport(from, to){
-      axios.delete('http://localhost:3000/reports/'+to+'/'+from.id, { headers: { Authorization: 'bearer ' + localStorage.getItem('token')}})
+      instance.delete('/reports/'+to+'/'+from.id, { headers: { Authorization: 'bearer ' + localStorage.getItem('token')}})
       .then(() => {this.$store.commit('deleteReport');this.getAllPost()})
       .catch((error) =>{console.log(error)})
     },
     sendComment(posting){
       if(document.getElementById('textComment'+posting.id).value != ''){
-        console.log('sending message');
-        axios.post('http://localhost:3000/comments/', {text: document.getElementById('textComment'+posting.id).value, userId: localStorage.getItem('userId'),
-         postingId: posting.id}, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
+        instance.post('/comments/',
+        {text: document.getElementById('textComment'+posting.id).value, userId: localStorage.getItem('userId'), postingId: posting.id},
+        {headers: {Authorization: 'bearer '+localStorage.getItem('token')}})
         .then(()=>{document.getElementById('textComment'+posting.id).value = '';
                   let fileEl = document.getElementById('collapse'+posting.id);
                   fileEl.classList.add('show');
@@ -380,36 +377,36 @@ export default {
       }
     },
     deleteComment(comment){
-      axios.delete('http://localhost:3000/comments/by/'+comment.UserId+'/'+comment.id, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
+      instance.delete('/comments/by/'+comment.UserId+'/'+comment.id, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
       .then(()=>{this.getAllPost()})
       .catch((error) =>{console.log(error)})
     },
     answerComment(comment, posting){
-        document.getElementById('comment'+comment.id).classList.replace('message', 'selectedMessageToAnswer');
-        document.getElementById('textComment'+posting.id).focus()
-        document.getElementById('textComment'+posting.id).setAttribute("placeholder", "Répondez au commentaire !")
-        this.answering = true;
-        this.answeringId = comment.id
-        document.getElementById('sendingMessage').addEventListener("blur", ()=>{
-          document.getElementById('comment'+this.answeringId).classList.replace('selectedMessageToAnswer','message');
-          document.getElementById('textComment'+posting.id).setAttribute("placeholder", "Écrivez un commentaire !")
+        document.getElementById('commentText'+comment.id).classList.replace('message', 'selectedMessageToAnswer');
+        let form = document.getElementById('sendingMessage');
+        let textComment = document.getElementById('textComment'+posting.id);
+        textComment.focus(); textComment.setAttribute("placeholder", "Répondez au commentaire !")
+        this.answering = true; this.answeringId = comment.id
+        form.addEventListener("blur", ()=>{
+          document.getElementById('commentText'+this.answeringId).classList.replace('selectedMessageToAnswer','message');
+          textComment.setAttribute("placeholder", "Écrivez un commentaire !")
           this.answering = false;
-          this.answeringId = null
         })
     },
     sendAnswer(posting){
-            if(document.getElementById('textComment'+posting.id).value != ''){
-        axios.post('http://localhost:3000/comments/', {text: document.getElementById('textComment'+posting.id).value, userId: localStorage.getItem('userId'),
-         commentId: this.answeringId}, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
+      if(document.getElementById('textComment'+posting.id).value != ''){
+        instance.post('/comments/',
+        {text: document.getElementById('textComment'+posting.id).value, userId: localStorage.getItem('userId'),commentId: this.answeringId},
+        {headers:{Authorization: 'bearer '+localStorage.getItem('token')}})
         .then(()=>{document.getElementById('textComment'+posting.id).value = '';
-          document.getElementById('comment'+this.answeringId).classList.replace('selectedMessageToAnswer','message');
-          this.answering = false;
-          this.answeringId = null
+          document.getElementById('commentText'+this.answeringId).classList.replace('selectedMessageToAnswer','message');
+          this.answering = false;this.answeringId = null
           let fileEl = document.getElementById('collapse'+posting.id);
           fileEl.classList.add('show');
+          document.getElementById('textComment'+posting.id).setAttribute("placeholder", "Écrivez un commentaire !");
           this.getAllPost()})
         .catch((error) =>{console.log(error)})
-              }
+      }
       else{
         return;
       }
@@ -436,10 +433,6 @@ export default {
   mounted() {
     this.getAllPost()
   },
-  // created(){
-  //   this.getAllPost()
-  // }
-  
 };
 </script>
 
@@ -515,75 +508,4 @@ ul{
   padding: .5rem;
   background-color: white;
 }
-
-.conteneur_general_load_10{overflow:hidden;width:145px;height:85px}
-.cle_bleu_load_10{
-  border-radius:50px;
-  width:50px;
-  height:50px;
-  border-top:10px solid #EBCCCC;
-  border-right:10px solid #E94426;
-  border-bottom:10px solid #EBCCCC;
-  border-left:10px solid #E94426;
-  -webkit-animation:load_dix 1.4s infinite linear;
-  -moz-animation:load_dix 1.4s infinite linear;
-  -ms-animation:load_dix 1.4s infinite linear;
-  -o-animation:load_dix 1.4s infinite linear;
-  animation:load_dix 1.4s infinite linear}
-  
-@-webkit-keyframes load_dix{
-  0%{-webkit-transform:rotate(0deg);
-  -moz-transform:rotate(0deg);
-  -ms-transform:rotate(0deg);
-  transform:rotate(0deg)}
-  50%{-webkit-transform:rotate(360deg);
-  -moz-transform:rotate(360deg);
-  -ms-transform:rotate(360deg);
-  transform:rotate(360deg)}
-  100%{-webkit-transform:rotate(720deg);
-  -moz-transform:rotate(720deg);
-  -ms-transform:rotate(720deg);
-  transform:rotate(720deg)}}
-  
-@-moz-keyframes load_dix{
-  0%{-webkit-transform:rotate(0deg);
-  -moz-transform:rotate(0deg);
-  -ms-transform:rotate(0deg);
-  transform:rotate(0deg)}
-  50%{-webkit-transform:rotate(360deg);
-  -moz-transform:rotate(360deg);
-  -ms-transform:rotate(360deg);
-  transform:rotate(360deg)}
-  100%{-webkit-transform:rotate(720deg);
-  -moz-transform:rotate(720deg);
-  -ms-transform:rotate(720deg);
-  transform:rotate(720deg)}}
-  
-@-ms-keyframes load_dix{
-  0%{-webkit-transform:rotate(0deg);
-  -moz-transform:rotate(0deg);
-  -ms-transform:rotate(0deg);
-  transform:rotate(0deg)}
-  50%{-webkit-transform:rotate(360deg);
-  -moz-transform:rotate(360deg);
-  -ms-transform:rotate(360deg);
-  transform:rotate(360deg)}
-  100%{-webkit-transform:rotate(720deg);
-  -moz-transform:rotate(720deg);
-  -ms-transform:rotate(720deg);
-  transform:rotate(720deg)}}
-  
-@keyframes load_dix{
-  0%{-webkit-transform:rotate(0deg);
-  -moz-transform:rotate(0deg);
-  -ms-transform:rotate(0deg);
-  transform:rotate(0deg)}
-  50%{-webkit-transform:rotate(360deg);
-  -moz-transform:rotate(360deg);
-  -ms-transform:rotate(360deg);
-  transform:rotate(360deg)}
-  100%{-webkit-transform:rotate(720deg);
-  -moz-transform:rotate(720deg);
-  -ms-transform:rotate(720deg);
-  transform:rotate(720deg)}}
 </style>

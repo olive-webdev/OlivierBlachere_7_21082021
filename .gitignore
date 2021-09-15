@@ -108,3 +108,4 @@ dist
 howTo.md
 .DS_Store
 /backend/images
+.env

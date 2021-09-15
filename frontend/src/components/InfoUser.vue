@@ -6,7 +6,8 @@
           <div class="photo border border-primary rounded">
             <img v-if="userProfil.Ppicture"  :src="userProfil.Ppicture"/>
             <img v-else class="" src="@/assets/defaultProfilPicture.jpeg"/>
-            <BIconTrash @click="deletePhoto()" class="fs-2 pointer trash position-absolute"/>
+            <BIconTrash v-if="$store.state.user.admin == true || $store.state.user.userId == userProfil.id"
+             @click="deletePhoto()" class="fs-2 pointer trash position-absolute"/>
             <BIconPencilSquare class="fs-2 change position-absolute"/>
           </div>
         </div>
@@ -80,12 +81,13 @@
       </div>   
     </div>
   </div>
-  <div v-if="userProfil.id == null" class="fs-1 mt-5">Utilisateur inexistant</div>
+  <div v-if="userProfil.id == null" class="fs-1 mt-5 text-center">Utilisateur inexistant</div>
 </template>
 
 <script>
-import { ref } from '@vue/reactivity';
+// import { ref } from '@vue/reactivity';
 const axios = require("axios").default;
+const instance = axios.create({baseURL: 'http://localhost:3000'})
 var passwordValidator = require('password-validator');
 var schema = new passwordValidator();
 schema
@@ -99,7 +101,7 @@ export default {
         user: localStorage.getItem('userId'),
         token: localStorage.getItem('token'),
         userProfilId : this.$route.params.id,
-        userProfil: ref({}),
+        userProfil: {},
         modifyToggle: false,
         passwordToggle: false,
         deleteToggle: false,
@@ -110,7 +112,7 @@ export default {
     },
     methods:{
         getUserInfo(){
-            axios.get("http://localhost:3000/users/" + this.userProfilId, { headers: { Authorization: 'bearer ' + this.token}})
+            instance.get("/users/" + this.userProfilId, { headers: { Authorization: 'bearer ' + this.token}})
             .then((res) => {
                 this.userProfil = { admin: res.data.admin, id: res.data.id, surname: res.data.surname,
                 name: res.data.name, service: res.data.service, email: res.data.email,
@@ -129,23 +131,22 @@ export default {
           this.deleteToggle = !this.deleteToggle
         },
         saveNewProfil(){
-            if(this.userProfilId != this.user && this.$store.state.user.admin == true){
-              axios.put('http://localhost:3000/users/' + this.userProfil.id, {email: this.userProfil.email, surname: this.userProfil.surname, name: this.userProfil.name, service: this.userProfil.service, Ppicture: this.userProfil.photo, password: this.userProfil.password}, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
-              .then(this.getUserInfo())
-              .catch((error) =>{console.log(error)})
-              this.modifyToggle = !this.modifyToggle}
-            else{
-              this.$store.dispatch('modifyProfil', this.userProfil)
-              .then(this.getUserInfo())
-              .catch(function (error){console.log(error)})
-              this.modifyToggle = !this.modifyToggle}
+          if(this.userProfilId != this.user && this.$store.state.user.admin == true){
+            instance.put('/users/' + this.userProfil.id, {email: this.userProfil.email, surname: this.userProfil.surname, name: this.userProfil.name, service: this.userProfil.service, Ppicture: this.userProfil.photo, password: this.userProfil.password}, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
+            .then(() => this.getUserInfo())
+            .catch((error) =>{console.log(error)})
+            this.modifyToggle = !this.modifyToggle}
+          else{
+            this.$store.dispatch('modifyProfil', this.userProfil)
+            .then(() => this.getUserInfo())
+            .catch(function (error){console.log(error)})
+            this.modifyToggle = !this.modifyToggle}
         },
         saveNewPassword(){
-          if(schema.validate(this.newPassword) && this.newPassword == this.newPasswordVerif){
-            this.userProfil.password = this.newPassword;
-            this.$store.dispatch('modifyProfil', this.userProfil)
-            .then()
-            .catch(function (error){console.log(error)})
+          if((schema.validate(this.newPassword) && this.newPassword == this.newPasswordVerif) && (this.userProfilId == this.user || this.$store.state.user.admin == true)){
+            instance.put('/users/' + this.userProfil.id, {password: this.newPassword}, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
+            .then(() => this.getUserInfo())
+            .catch((error) =>{console.log(error)})
             this.passwordToggle = false
           }
           else if(schema.validate(this.newPassword) && this.newPassword != this.newPasswordVerif){
@@ -163,7 +164,7 @@ export default {
           this.userProfil.Ppicture = this.$refs.Ppicture.files[0];
           let formData = new FormData();
           formData.append('image', this.userProfil.Ppicture)
-          axios.put("http://localhost:3000/users/" + this.userProfil.id + "/photo", formData, { headers: {  Authorization: 'bearer ' + localStorage.getItem('token') }})
+          instance.put("/users/" + this.userProfil.id + "/photo", formData, { headers: {  Authorization: 'bearer ' + localStorage.getItem('token') }})
           .then(() => {
             this.$store.dispatch('getUser', {
             id: localStorage.getItem('userId'),
@@ -174,7 +175,8 @@ export default {
           .catch((json) => console.log(json));
         },
         deletePhoto(){
-          axios.delete("http://localhost:3000/users/" + this.userProfil.id + "/photo", { headers: {  Authorization: 'bearer ' + localStorage.getItem('token') }})
+          if(this.userProfil.Ppicture){
+            instance.delete("/users/" + this.userProfil.id + "/photo", { headers: {  Authorization: 'bearer ' + localStorage.getItem('token') }})
           .then(() => {
             this.$store.dispatch('getUser', {
             id: localStorage.getItem('userId'),
@@ -183,25 +185,29 @@ export default {
             .catch()
           })
           .catch((json) => console.log(json));
+          }
+          else{
+            console.log('pas de photo à supprimer')
+          }
+          
         },
         deletingAccount(){
-          axios.delete("http://localhost:3000/users/" + this.userProfil.id,{ headers: {  Authorization: 'bearer ' + localStorage.getItem('token') }})
+          instance.delete("/users/" + this.userProfil.id,{ headers: {  Authorization: 'bearer ' + localStorage.getItem('token') }})
           .then(() => {
-            localStorage.removeItem("userId");
-            localStorage.removeItem("userToken");
-            this.$store.state.user.userId = -1;
             if(this.$store.state.user.admin == true){
               this.$router.push("/administration");
             }
             else{
-              this.$router.push("/connexion");
+            this.$store.state.user.userId = -1;
+            localStorage.removeItem("userId");
+            localStorage.removeItem("token");
+            this.$router.push("/connexion");
             }
           })
           .catch((json) => console.log(json));
         }
     },
     beforeMount(){this.getUserInfo()},
-    beforeUpdated(){this.getUserInfo()}
 }
 </script>
 
