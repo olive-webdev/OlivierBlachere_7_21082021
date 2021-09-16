@@ -5,9 +5,10 @@
       <div class="col-3 mt-3">
         <Menu class="d-none d-lg-block"/>
       </div>
-      <div class="col-lg-9 col-12 mt-3">
+      <div v-if="$store.state.user.admin" class="col-lg-9 col-12 mt-3">
         <Admin />
       </div>
+      <div v-else class="col-lg-9 col-12 mt-3 fs-3">Vous devez être administrateur pour accéder à cette page</div>
     </div>
   </div>
 </template>

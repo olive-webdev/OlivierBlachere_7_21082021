@@ -19,43 +19,22 @@ exports.deleteComment = (req, res) => {
     const token        = req.headers.authorization.split(' ')[1];
     const decodedToken = jwt.verify(token, "privateKey");
     const userId       = decodedToken.userId;
-    if(userId != id){
-        models.User.findOne({
-            where: { id : userId }
-            })
-        .then((User) => {
-            if(User.admin === true){
-                models.Comment.findOne({
-                    where: { id : idComment }
-                    })
-                    .then((Comment) => {
-                        if(Comment === null){res.status(500).json({ 'error': "pas de commentaire trouvé" })}
-                        else{
-                                models.Comment.destroy({where: { id : idComment }})
-                                .then(() => {res.status(200).json({'message' : "commentaire supprimé par l'utilisateur"})})
-                                .catch(() => res.status(500).json({ 'error': "erreur à la suppression du commentaire" }))
-                            }
-                    })
-                    .catch(() => res.status(500).json({ 'error': "erreur à la suppression du commentaire" }))
-            }
-            else{
-                res.status(500).json({ 'error': "vous devez être administrateur pour effectuer cette opération"});}
+    models.User.findOne({where: {id : userId}})
+    .then((User) => {
+        let administrator = User.admin ? true : false;
+        if(userId == id || administrator === true){
+            models.Comment.findOne({where: { id: idComment }})
+                .then((Comment) => {
+                    if(Comment === null){res.status(500).json({ 'error': "pas de commentaire trouvé" })}
+                    else{
+                        models.Comment.destroy({where: { id : idComment }})
+                        .then(() => {res.status(200).json({'message' : "commentaire supprimé"})})
+                        .catch(() => res.status(500).json({ 'error': "erreur à la suppression du commentaire" }))
+                    }
+                })
+                .catch(() => res.status(500).json({ 'error': "erreur à la suppression du commentaire" }))
+        }
+        else{res.status(500).json({ 'error': "vous devez être administrateur pour effectuer cette opération"});}
         })
-        .catch(() => res.status(500).json({ 'error': "vous n'avez pas les droits pour effectuer cette opération"}))
-    }
-    else{
-        models.Comment.findOne({
-            where: {id : idComment }
-            })
-            .then((Comment) => {
-                if(Comment === null){res.status(500).json({ 'error': "pas de commentaire trouvé" })}
-                else{
-                    models.Comment.destroy({where: { id : idComment }})
-                    .then(() => {res.status(200).json({'message' : "commentaire supprimé par l'utilisateur"})})
-                    .catch(() => res.status(500).json({ 'error': "erreur à la suppression du commentaire" }))
-                }
-                
-            })
-            .catch(() => res.status(500).json({ 'error': "pas de publication trouvée" }))
-    }
+    .catch(() => res.status(500).json({ 'error': "vous n'avez pas les droits pour effectuer cette opération"}))
 };

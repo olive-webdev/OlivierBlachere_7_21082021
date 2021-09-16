@@ -5,24 +5,11 @@ const fs = require('fs');
 exports.createPosting = (req, res) => {
     const text   = req.body.text;
     const userId = req.body.userId;
-    if(req.file != undefined)
-    {const image  = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+    let image
+    req.file != undefined ? image  = `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : image = null
     models.Posting.create({ userId: userId, text: text, image: image })
-    .then((newPosting) => res.status(201).json({
-        'message'    : "publication créée !",
-        'userId'     : newPosting.userId,
-        'text'       : newPosting.text,
-        'image'      : newPosting.image,
-        'créé le'    : newPosting.createdAt}))
-    .catch((error) => {  console.log(error) })}    
-    else{const image = null;
-    models.Posting.create({ userId: userId, text: text, image: image })
-        .then((newPosting) => res.status(201).json({
-            'message'    : "publication créée !",
-            'userId'     : newPosting.userId,
-            'text'       : newPosting.text,
-            'créé le'    : newPosting.createdAt}))
-        .catch((error) => {  console.log(error) })}
+    .then(() => res.status(201).json({'message' : "publication créée !"}))
+    .catch((error) => res.status(500).json({ 'error': "erreur à la création de la publication" }))
 };
 
 exports.getAllPostings = (req, res) => {
@@ -50,21 +37,16 @@ exports.getOnePostingBy = (req, res) => {
     const idPosting = req.params.idPosting;
     models.Posting.findOne({where: {UserId : userId, id : idPosting}})
     .then((Posting) => {
-        if(Posting === null){res.status(500).json({ 'error': "pas de publication trouvée" })}
-        else{res.status(200).json(Posting)}
+        Posting === null ? res.status(500).json({ 'error': "pas de publication trouvée" }) : res.status(200).json(Posting)
     })
     .catch(() => res.status(500).json({ 'error': "Pas encore de publication" }));
 };
 
 exports.getOnePosting = (req, res) => {
     const id = req.params.id;
-    models.Posting.findOne({
-        where: { id: id }
-    })
+    models.Posting.findOne({where: { id: id }})
     .then((Posting) => {
-        if(Posting === null){res.status(500).json({ 'error': "publication non trouvée" })}
-        else{res.status(200).json(Posting)}
-        
+        Posting === null ? res.status(500).json({ 'error': "pas de publication trouvée" }) : res.status(200).json(Posting)
     })
     .catch(() => res.status(500).json({ 'error': "pas de publication trouvée" }));
 };
@@ -75,96 +57,28 @@ exports.modifyPosting = (req, res) => {
     const token = req.headers.authorization.split(' ')[1];
     const decodedToken = jwt.verify(token, "privateKey");
     const userId = decodedToken.userId;
-    if(userId != id){
-        models.User.findOne({where: { id : userId }})
-        .then((User) => {
-            if(User.admin === true){
-                models.Posting.findOne({
-                    where: { UserId : id, id : idPosting }
-                    })
-                    .then((Posting) => {
-                        if(req.file != undefined){
-                            const newText = req.body.text;
-                            Posting.text = newText;
-                            const newImage = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
-                            Posting.image = newImage;
-                            Posting.save();
-                            res.status(200).json({ 'message': "publication avec image modifiée par l'administrateur"});
+    models.User.findOne({where: {id : userId}})
+    .then((User) => {
+        let administrator = User.admin ? true : false;
+        if(userId == id || administrator === true){
+            models.Posting.findOne({where: { id: idPosting }})
+                .then((Posting) => {
+                    if(Posting === null){res.status(500).json({ 'error': "pas de publication trouvée" })}
+                    else{
+                        if(Posting.image != null){
+                            const filename = Posting.image.split('/images/')[1]; // suppression de l'ancienne image
+                            fs.unlink(`images/${filename}`, (err) =>{console.log(err)})
                         }
-                        else if (req.file == undefined && req.body.image == undefined){
-                            const filename = Posting.image.split('/images/')[1];
-                            fs.unlink(`images/${filename}`, (err) => {
-                            if (err) {
-                            console.log("impossible de supprimer l'image:"+err);
-                            }
-                            else {
-                                console.log("image deleted")
-                                const newText = req.body.text;
-                                Posting.image = null
-                                Posting.text = newText;
-                                Posting.save();
-                                res.status(200).json({ 'message': "publication sans image modifiée par l'administrateur"});                                
-                            }})   
-                        }
-                        else if(req.body.image == "noChange"){
-                            console.log("no change")
-                            const newText = req.body.text;
-                            Posting.text = newText;
-                            Posting.save();
-                            res.status(200).json({ 'message': "publication identique modifiée par l'administrateur"});
-                        }
-                        })
-                    
-                    .catch(() => res.status(500).json({ 'error': "pas de publication trouvée" }))
-            }
-            else{
-                res.status(500).json({ 'error': "vous devez être administrateur pour effectuer cette opération"});}
-        })
-        .catch(() => res.status(500).json({ 'error': "vous n'avez pas les droits pour effectuer cette opération"}))
-    }
-    else{
-        models.Posting.findOne({
-        where: { UserId : id , id: idPosting }
-        })
-        .then((Posting) => {
-            if(Posting.userId != userId){
-                res.status(500).json({ 'error': "vous n'avez pas les droits pour effectuer cette opération"})
-            }
-            else{
-                if(req.file != undefined){
-                    const newText = req.body.text;
-                    Posting.text = newText;
-                    const newImage = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
-                    Posting.image = newImage;
-                    Posting.save();
-                    res.status(200).json({ 'message': "publication avec image modifiée par l'utilisateur"});
-                }
-                else if (req.file == undefined && req.body.image == undefined){
-                    const filename = Posting.image.split('/images/')[1];
-                    fs.unlink(`images/${filename}`, (err) => {
-                    if (err) {
-                    console.log("impossible de supprimer l'image:"+err);
-                    }
-                    else {
-                        console.log("image deleted")
-                        const newText = req.body.text;
-                        Posting.image = null
-                        Posting.text = newText;
+                        req.file === undefined ? Posting.image = null : Posting.image = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+                        Posting.text = req.body.text;
                         Posting.save();
-                        res.status(200).json({ 'message': "publication sans image modifiée par l'utilisateur"});                                
-                    }})   
-                }
-                else if(req.body.image == "noChange"){
-                    console.log("no change")
-                    const newText = req.body.text;
-                    Posting.text = newText;
-                    Posting.save();
-                    res.status(200).json({ 'message': "publication identique modifiée par l'utilisateur"});
-                }
-            }
-        })
-        .catch(() => res.status(500).json({ 'error': "pas de publication trouvée" }));
-    }
+                        res.status(200).json({ 'message': "publication avec image modifiée par l'utilisateur"});
+                    }
+                })
+                .catch(() => res.status(500).json({ 'error': "erreur modification impossible" }));
+        }
+        else{res.status(500).json({ 'error': "erreur" })}
+    })
 };
 
 exports.deletePosting = (req, res) => {
@@ -173,59 +87,25 @@ exports.deletePosting = (req, res) => {
     const token        = req.headers.authorization.split(' ')[1];
     const decodedToken = jwt.verify(token, "privateKey");
     const userId       = decodedToken.userId;
-    if(userId != id){
-        models.User.findOne({
-            where: { id : userId }
-            })
-        .then((User) => {
-            if(User.admin === true){
-                models.Posting.findOne({
-                    where: { id : idPosting }
-                    })
-                    .then((Posting) => {
-                        if(Posting === null){res.status(500).json({ 'error': "pas de publication trouvée" })}
-                        else{
-                            if(Posting.image != null){
-                                const filename = Posting.image.split('/images/')[1]; // suppression de l'ancienne image
-                                fs.unlink(`images/${filename}`, () =>{
-                                models.Posting.destroy({where: { id : idPosting }})
-                                .then(() => {res.status(200).json({'message' : "publication supprimée par l'utilisateur"})})
-                                .catch(() => res.status(500).json({ 'error': "erreur à la suppression de la publication" }))
-                                })}
-                            else{
-                                models.Posting.destroy({where: { id : idPosting }})
-                                .then(() => {res.status(200).json({'message' : "publication supprimée par l'utilisateur"})})
-                                .catch(() => res.status(500).json({ 'error': "erreur à la suppression de la publication" }))
-                            }}
-                    })
-                    .catch(() => res.status(500).json({ 'error': "erreur à la suppression de la publication" }))
-            }
-            else{
-                res.status(500).json({ 'error': "vous devez être administrateur pour effectuer cette opération"});}
-        })
-        .catch(() => res.status(500).json({ 'error': "vous n'avez pas les droits pour effectuer cette opération"}))
-    }
-    else{
-        models.Posting.findOne({
-            where: { UserId : id, id : idPosting }
-            })
-            .then((Posting) => {
-                if(Posting === null){res.status(500).json({ 'error': "pas de publication trouvée" })}
-                else{
-                    if(Posting.image != null){
-                        const filename = Posting.image.split('/images/')[1]; // suppression de l'ancienne image
-                        fs.unlink(`images/${filename}`, () =>{
-                        models.Posting.destroy({where: { id : idPosting }})
-                        .then(() => {res.status(200).json({'message' : "publication supprimée par l'utilisateur"})})
-                        .catch(() => res.status(500).json({ 'error': "erreur à la suppression de la publication" }))
-                    })}
+    models.User.findOne({where: {id : userId}})
+    .then((User) => {
+        let administrator = User.admin ? true : false;
+        if(userId == id || administrator === true){
+            models.Posting.findOne({where: { id: idPosting }})
+                .then((Posting) => {
+                    if(Posting === null){res.status(500).json({ 'error': "pas de publication trouvée" })}
                     else{
-                        models.Posting.destroy({where: { id : idPosting }})
-                        .then(() => {res.status(200).json({'message' : "publication supprimée par l'utilisateur"})})
-                        .catch(() => res.status(500).json({ 'error': "erreur à la suppression de la publication" }))
-                    }
-                }
-            })
-            .catch(() => res.status(500).json({ 'error': "pas de publication trouvée" }))
-    }
+                        if(Posting.image != null){
+                            const filename = Posting.image.split('/images/')[1]; // suppression de l'ancienne image
+                            fs.unlink(`images/${filename}`, (err) =>{console.log(err)})}
+                            models.Posting.destroy({where: { id : idPosting }})
+                            .then(() => {res.status(200).json({'message' : "publication supprimée"})})
+                            .catch(() => res.status(500).json({ 'error': "erreur à la suppression de la publication" }))
+                        }
+                    })
+                .catch(() => res.status(500).json({ 'error': "erreur à la suppression gjghfjde la publication" }))
+            }
+        else{res.status(500).json({ 'error': "vous devez être administrateur pour effectuer cette opération"});}
+        })
+    .catch((error) => res.status(500).json({ 'error': error }))
 };

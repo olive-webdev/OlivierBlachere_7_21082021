@@ -10,7 +10,7 @@ const path          = require("path");
 const rateLimit     = require("express-rate-limit");
 const dotenv        = require('dotenv').config();
 const app           = express();
-const limiter       = rateLimit({windowMs: 60 * 60 *1000, max: 500})
+const limiter       = rateLimit({windowMs: 60 * 60 *1000, max: 1000})
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());

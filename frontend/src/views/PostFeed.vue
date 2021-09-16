@@ -268,35 +268,17 @@ export default {
     },
     modifyPosting(posting){
       let formData = new FormData();
-      if(document.getElementById(posting.id).files[0] != null || document.getElementById(posting.id).files[0] != undefined){
-        console.log("avec une nouvelle image")
-        this.image = document.getElementById(posting.id).files[0];
-        formData.append('image', this.image)
-        formData.append('text', document.getElementById("textModified").value)
-        formData.append('userId', localStorage.getItem('userId'))
-        instance.put('/postings/by/' +posting.UserId+ "/" + posting.id , formData, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
-        .then(()=>{this.getAllPost()})
-        .catch((error) =>{console.log(error)})}
-      else {
-        if(posting.imageDeleted){
-          console.log("image supprimée")
-          formData.append('text', document.getElementById("textModified").value)
-          formData.append('userId', localStorage.getItem('userId'))
-          instance.put('/postings/by/' +posting.UserId+ "/" + posting.id , formData, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
-          .then(()=>{this.getAllPost();this.emoji = false; this.photo = false;})
-          .catch((error) =>{console.log(error)})}
-        else{
-        console.log("même image")
-          formData.append('image', 'noChange')
-          formData.append('text', document.getElementById("textModified").value)
-          formData.append('userId', localStorage.getItem('userId'))
-          instance.put('/postings/by/' +posting.UserId+ "/" + posting.id , formData, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
-          .then(()=>{this.getAllPost();this.emoji = false; this.photo = false;})
-          .catch((error) =>{console.log(error)})}
-      }
+      if(posting.imageDeleted == undefined){posting.imageDeleted = false}
+      if(posting.imageDeleted == true){this.image = null}
+      else{this.image = document.getElementById(posting.id).files[0]}
+      formData.append('image', this.image)
+      formData.append('text', document.getElementById("textModified").value)
+      formData.append('userId', localStorage.getItem('userId'))
+      instance.put('/postings/by/' +posting.UserId+ "/" + posting.id , formData, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
+      .then(()=>{this.getAllPost();this.emoji = false; this.photo = false; posting.imageDeleted = false})
+      .catch((error) =>{console.log(error)})
     },
     getAllPost(){
-      this.loading = true;
       instance.get('/postings/', { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
       .then((response)=>{this.postings = response.data.slice().reverse(); this.comments = response.data.Comments; console.log(response.data)})
       .catch((error) =>{console.log(error)})
@@ -310,10 +292,7 @@ export default {
       this.text = this.text.concat(' ', emoji); this.emoji = false;
     },
     emojiMessageToggle(posting){
-      if(this.emojiMessage == posting.id){
-        this.emojiMessage = !posting.id
-      }
-      else{this.emojiMessage = posting.id}
+      this.emojiMessage == posting.id ? this.emojiMessage = !posting.id : this.emojiMessage = posting.id
     },
     addEmojiMessage(emoji, posting){
       document.getElementById('textComment'+posting.id).value = document.getElementById('textComment'+posting.id).value.concat(' ', emoji); this.emojiMessage = false;
@@ -341,7 +320,7 @@ export default {
       this.modifiedUrl= '',
       posting.imageDeleted = true
       this.photo = !this.photo;
-      console.log(this.modifiedUrl , posting.imageDeleted)
+      document.getElementById(posting.id).value = ''
     },
     modifyPost(posting){
       posting.toggle = !posting.toggle

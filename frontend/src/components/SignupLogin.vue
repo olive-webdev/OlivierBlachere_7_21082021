@@ -1,7 +1,7 @@
 <template>
     <div class="d-flex justify-content-center">
-        <div id="login" class="bg-white rounded px-5 shadow mt-0 mt-lg-5">
-            <img src="@/assets/icon.svg" height="150" alt="" class="mb-3" />
+        <div id="login" class="bg-white rounded px-5 shadow mt-0 mt-lg-5 d-flex flex-column align-center">
+            <img src="@/assets/icon.svg" height="150" alt="" class="my-3 mx-auto" />
             <form @submit.prevent="">
                 <div v-if="status == 'errorLogin'" class="text-danger mb-4">Impossible de se connecter, vérifier votre email et votre mot de passe</div>
                 <div v-if="status == 'errorSignup'" class="text-danger mb-4">Impossible de créer ce compte, utilisateur déjà enregistré</div>
@@ -34,8 +34,8 @@
                     <span v-if="status == 'connecting...'">Connection en cours</span><span v-else>Se connecter</span>
                 </button>
                 <button v-else :disabled="!validForm" type="submit" class="btn btn-secondary border-primary py-2 my-3 w-100" @click="signup()">S'inscrire</button>
-                <p v-if="toggle" @click="switching()" class="mt-3 pointer">Pas encore de compte ?</p>
-                <p v-else @click="switching()" class="mt-3 pointer">Déjà enregistré ?</p>
+                <p v-if="toggle" @click="switching()" class="my-4 pointer">Pas encore de compte ?</p>
+                <p v-else @click="switching()" class="my-4 pointer">Déjà enregistré ?</p>
             </form>
         </div>
     </div>

@@ -4,20 +4,15 @@ const models = require("../models/");
 const multer = require('../middleware/multer');
 const fs = require('fs');
 
-exports.signup = (req, res) => {
-    // récupération des informations entrées par l'utilisateur
+exports.signup = (req, res) => { // récupération des informations entrées par l'utilisateur
     const email    = req.body.email;
     const password = req.body.password;
     const name     = req.body.name;
     const surname  = req.body.surname;
-
-    models.User.findOne({ //on cherche dans la base de données si l'utilisateur existe déjà
-        attributes: ['email'],
-        where: { email: email }
-    })
+    models.User.findOne({attributes: ['email'],where: { email: email }})//on cherche dans la base de données si l'utilisateur existe déjà
     .then((User) => {
         if(User){
-            return res.status(409).json({ 'error': 'utilisateur déjà existant'});
+            res.status(409).json({ 'error': 'utilisateur déjà existant'});
         }
         else if(name == undefined || name == "") {
             res.status(400).json({ 'error': 'veuillez renseigner un prénom' });
@@ -25,7 +20,7 @@ exports.signup = (req, res) => {
         else if(surname == undefined || surname == "") {
             res.status(400).json({ 'error': 'veuillez renseigner un nom' });
         }
-        else{ //création du compte dans la base de données
+        else{ // création du compte dans la base de données
             bcrypt.hash(password, 2, function( err, bcryptedPassword ){
                 const newUser = models.User.create({ name: name, surname: surname, email: email, password: bcryptedPassword})
                 .then((newUser) => res.status(201).json({
@@ -46,14 +41,9 @@ exports.login = (req, res) => {
     // récupération des informations entrées par l'utilisateur
     const email    = req.body.email;
     const password = req.body.password;
-
-    models.User.findOne({ //on cherche dans la base de données si l'utilisateur existe
-        where: { email: email }
-    })
+    models.User.findOne({where: { email: email }})//on cherche dans la base de données si l'utilisateur existe
     .then((User) => { //si l'utilisateur est introuvable dans la base de données
-        if(!User){
-            res.status(400).send("utilisateur introuvable");
-        }
+        if(!User){res.status(400).send("utilisateur introuvable");}
         else{
             bcrypt.compare(password, User.password) //comparaison des mots de passe
                 .then(function(result){
@@ -65,7 +55,7 @@ exports.login = (req, res) => {
                 })
                 .catch(() => res.status(400).json({ error: 'connexion impossible' }))
         }
-        })
+    })
     .catch(() => res.status(400).json({ error: "utilisateur introuvable" }));
 };
 
@@ -77,9 +67,7 @@ exports.getAllUsers = (req, res) => { //renvoie un tableau de tous les utilisate
 
 exports.getOneUser = (req, res) => { //renvoie les information d'un utilisateur
     const id = req.params.id;
-    models.User.findOne({
-        where: { id: id }
-    })
+    models.User.findOne({where: { id: id }})
     .then((User) => {
         if(User === null){res.status(500).json({ 'error': "pas d'utilisateur trouvé" })}
         else{res.status(200).json(User)}
@@ -119,76 +107,33 @@ exports.modifyPhoto = (req, res) => {
     const token = req.headers.authorization.split(' ')[1];
     const decodedToken = jwt.verify(token, "privateKey");
     const userId = decodedToken.userId;
-    if(userId != id){
-        models.User.findOne({
-            where: { id : userId }
-            })
-        .then((User) => {
-            if(User.admin === true){
-                models.User.findOne({
-                    where: { id: id }
-                    })
-                    .then((User) => {
-                        if(User === null){res.status(500).json({ 'error': "pas d'utilisateur trouvé" })}
-                        else{
-                            if(User.Ppicture === null){
-                                User.Ppicture = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
-                                User.save()
-                                .then(()=>{res.status(200).json({ 'message': "données de l'utilisateur modifié par l'utilisateur"});})
-                                .catch(()=>{res.status(500).json({ 'error': "impossible de modifier la photo" })})
-                            }
-                            else{
-                                const filename = User.Ppicture.split('/images/')[1];
-                                fs.unlink(`images/${filename}`, (err) => {
-                                    if (err) {
-                                        console.log("impossible de supprimer l'image:"+err);
-                                    } else {
-                                        console.log('image supprimée');                                
-                                    }})
-                                User.Ppicture = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
-                                User.save()
-                                .then(()=>{res.status(200).json({ 'message': "données de l'utilisateur modifié par l'utilisateur"});})
-                                .catch(()=>{res.status(500).json({ 'error': "impossible de modifier la photo" })})
-                            }
+    models.User.findOne({where: {id : userId}})
+    .then((User) => {
+        let administrator = User.admin ? true : false;
+        if(userId == id || administrator === true){
+            models.User.findOne({where: { id: id }})
+                .then((User) => {
+                    if(User === null){res.status(500).json({ 'error': "pas d'utilisateur trouvé" })}
+                    else{
+                        if(User.Ppicture != null){
+                            const filename = User.Ppicture.split('/images/')[1];
+                            fs.unlink(`images/${filename}`, (err) => {
+                                if (err) {
+                                    console.log("impossible de supprimer l'image:"+err);
+                                } else {
+                                    console.log('image supprimée');                                
+                                }})}
+                            User.Ppicture = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+                            User.save()
+                            .then(()=>{res.status(200).json({ 'message': "données de l'utilisateur modifié par l'utilisateur"});})
+                            .catch(()=>{res.status(500).json({ 'error': "impossible de modifier la photo" })})
                         }
                     })
                     .catch(() => res.status(500).json({ 'error': "pas d'utilisateur trouvé" }));
             }
-            else{
-                res.status(500).json({ 'error': "vous devez être administrateur pour effectuer cette opération"});}
+        else{res.status(500).json({ 'error': "vous devez être administrateur pour effectuer cette opération"});}
         })
-        .catch(() => res.status(500).json({ 'error': "vous n'avez pas les droits pour effectuer cette opération"}))
-    }
-    else{
-        models.User.findOne({
-        where: { id: id }
-        })
-        .then((User) => {
-            if(User === null){res.status(500).json({ 'error': "pas d'utilisateur trouvé" })}
-            else{
-                if(User.Ppicture === null){
-                    User.Ppicture = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
-                    User.save()
-                    .then(()=>{res.status(200).json({ 'message': "données de l'utilisateur modifié par l'utilisateur"});})
-                    .catch(()=>{res.status(500).json({ 'error': "impossible de modifier la photo" })})
-                }
-                else{
-                    const filename = User.Ppicture.split('/images/')[1];
-                    fs.unlink(`images/${filename}`, (err) => {
-                        if (err) {
-                            console.log("impossible de supprimer l'image:"+err);
-                        } else {
-                            console.log('image supprimée');                                
-                        }})
-                    User.Ppicture = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
-                    User.save()
-                    .then(()=>{res.status(200).json({ 'message': "données de l'utilisateur modifié par l'utilisateur"});})
-                    .catch(()=>{res.status(500).json({ 'error': "impossible de modifier la photo" })})
-                }
-            }
-        })
-        .catch(() => res.status(500).json({ 'error': "impossible de mettre à jour" }));
-    }
+    .catch(() => res.status(500).json({ 'error': "erreur lors du changement d'image"}))  
 };
 
 exports.deletePhoto = (req, res) => {
@@ -196,90 +141,51 @@ exports.deletePhoto = (req, res) => {
     const token = req.headers.authorization.split(' ')[1];
     const decodedToken = jwt.verify(token, "privateKey");
     const userId = decodedToken.userId;
-    if(userId != id){
-        models.User.findOne({
-            where: { id : userId }
-            })
-        .then((User) => {
-            if(User.admin === true){
-                models.User.findOne({
-                    where: { id: id }
-                    })
-                    .then((User) => {
-                        if(User === null){res.status(500).json({ 'error': "pas d'utilisateur trouvé" })}
-                        else{
-                            const filename = User.Ppicture.split('/images/')[1];// suppression de l'ancienne image
-                            fs.unlink(`./images/${filename}`, () => {
-                            User.save()
-                            .then(()=>{res.status(200).json({ 'message': "photo supprimée par l'administrateur"});})
-                            .catch(()=>{res.status(500).json({ 'error': "impossible de supprimer la photo" })})})
+    models.User.findOne({where: {id : userId}})
+    .then((User) => {
+        let administrator = User.admin ? true : false;
+        if(userId == id || administrator === true){
+            models.User.findOne({where: { id: id }})
+                .then((User) => {
+                    if(User === null){res.status(500).json({ 'error': "pas d'utilisateur trouvé" })}
+                    else{
+                        const filename = User.Ppicture.split('/images/')[1];// suppression de l'ancienne image
+                        fs.unlink(`./images/${filename}`, () => {
+                        User.Ppicture = null
+                        User.save()
+                        .then(()=>{res.status(200).json({ 'message': "photo supprimée par l'administrateur"});})
+                        .catch(()=>{res.status(500).json({ 'error': "impossible de supprimer la photo" })})})
                         }
                     })
                     .catch(() => res.status(500).json({ 'error': "pas d'utilisateur trouvé" }));
             }
-            else{
-                res.status(500).json({ 'error': "vous devez être administrateur pour effectuer cette opération"});}
+            else{res.status(500).json({ 'error': "vous devez être administrateur pour effectuer cette opération"});}
         })
-        .catch(() => res.status(500).json({ 'error': "vous n'avez pas les droits pour effectuer cette opération"}))
-    }
-    else{
-        models.User.findOne({
-        where: { id: id }
-        })
-        .then((User) => {
-            if(User === null){res.status(500).json({ 'error': "pas d'utilisateur trouvé" })}
-            else{
-                const filename = User.Ppicture.split('/images/')[1]; // suppression de l'ancienne image
-                fs.unlink(`./images/${filename}`, () => {
-                User.Ppicture = null;
-                User.save()
-                .then(()=>{res.status(200).json({ 'message': "photo supprimée par l'utilisateur"});})
-                .catch(()=>{res.status(500).json({ 'error': "impossible de supprimer la photo" })})})
-            }
-        })
-        .catch(() => res.status(500).json({ 'error': "impossible de supprimer" }));
-    }
+    .catch(() => res.status(500).json({ 'error': "impossible de supprimer la photo"}))
 };
 exports.deleteUser = (req, res) => {
     const id = req.params.id;
     const token = req.headers.authorization.split(' ')[1];
     const decodedToken = jwt.verify(token, "privateKey");
     const userId = decodedToken.userId;   
-    if(userId != id){
-        models.User.findOne({
-            where: { id : userId }
-            })
-        .then((User) => {
-            if(User.admin === true){
-                models.User.findOne({
-                    where: { id: id }
-                    })
-                    .then((User) => {
-                        if(User === null){res.status(500).json({ 'error': "pas d'utilisateur trouvé" })}
-                        else{
-                            models.Posting.destroy(
-                                {where: {UserId : id}}
-                            )
-                            .then(() => {
-                                models.User.destroy(
-                                    {where: { id : id }}
-                                )
-                                .then(() => res.status(200).json({'message' : "utilisateur supprimé par l'utilisateur"}))
-                                .catch((error) => res.status(500).json(error));
-                            })
-                            .catch(() => res.status(500).json({ 'error': "erreur à la suppression des messages" }));
-                        }
-                    })
-                    .catch(() => res.status(500).json({ 'error': "pas d'utilisateur trouvé" }));
-            }
-            else{
-                res.status(500).json({ 'error': "vous n'avez pas les droits pour supprimer ce compte" })}})
-        .catch(() => res.status(500).json({ 'error': "vous n'avez pas les droits pour effectuer cette opération"}))}
-
-    else{
-        models.User.destroy(
-            {where: { id : id }}
-        )
-        .then(() => res.status(200).json({'message' : "compte utilisateur supprimé par l'utilisateur"}))
-        .catch((error) => res.status(500).json(error));
-}};
+    models.User.findOne({where: {id : userId}})
+    .then((User) => {
+        let administrator = User.admin ? true : false;
+        if(userId == id || administrator === true){
+            models.User.findOne({where: { id: id }})
+                .then((User) => {
+                    if(User === null){res.status(500).json({ 'error': "pas d'utilisateur trouvé" })}
+                    else{
+                        if(User.Ppicture != null){
+                        const filename = User.Ppicture.split('/images/')[1];// suppression de la photo de profil
+                        fs.unlink(`./images/${filename}`, (err) =>{console.log(err)})}
+                        models.User.destroy({where: { id : id }})
+                            .then(() => res.status(200).json({'message' : "utilisateur supprimé par l'utilisateur"}))
+                            .catch((error) => res.status(500).json(error));
+                    }
+                })
+                .catch(() => res.status(500).json({ 'error': "impossible de supprimé l'utilisateur" }));
+        }
+        else{res.status(500).json({ 'error': "vous n'avez pas les droits pour supprimer ce compte" })}})
+    .catch(() => res.status(500).json({ 'error': "vous n'avez pas les droits pour effectuer cette opération"}))
+};
