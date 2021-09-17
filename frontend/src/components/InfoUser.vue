@@ -80,12 +80,14 @@
         <button type="button" @click="deletingAccount()" class="btn btn-light border border-primary mb-3">J'ai bien compris, je souhaite supprimer mon compte</button>
       </div>   
     </div>
-    <div v-if="userMessage" class="userMessage justify-content-center align-items-center">
+    <transition name="fade">
+      <div v-if="userMessage" id="userMessage" class="userMessage d-flex position-fixed justify-content-center align-items-center w-100 h-100">
       <div class="fs-4 px-3 py-3 border border-primary rounded bg-light position-relative size text-wrap">
         {{userMessageText}}
         <button @click="userMessage = !userMessage" type="button" class="btn-close fs-6 position-absolute close" aria-label="Close"></button>
       </div>
     </div>
+    </transition>
   </div>
   <div v-if="userProfil.id == null" class="fs-1 mt-5 text-center">Utilisateur inexistant</div>
 </template>
@@ -224,7 +226,7 @@ export default {
     },
     modal(message){
       this.userMessage = true;
-      this.userMessageText = message
+      this.userMessageText = message;
     }
   },
   beforeMount(){this.getUserInfo()},
@@ -277,15 +279,16 @@ select option[selected]{
     background-color: rgb(235, 204, 204)
 }
 .userMessage{
-  display: flex;
-  position: fixed;
   z-index: 10000;
   left: 0;
   top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgb(0,0,0);
   background-color: rgba(0,0,0,0.4);
+}
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
 }
 .close{
   top:.2rem;

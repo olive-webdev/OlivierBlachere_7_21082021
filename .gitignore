@@ -107,6 +107,5 @@ dist
 # personnalized
 howTo.md
 .DS_Store
-/backend/images
 .env
 .env.development.local

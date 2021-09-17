@@ -21,7 +21,7 @@
               <button @click="loadPhoto()" class="fs-3 pointer mb-0 btn-none" type="button">&#127748; </button>
             </div>
             <input @change="addPhoto()" type="file" id="addingPhoto" class="inputfile"/>
-            <button @click="send()" type="submit"
+            <button @click.prevent="send()" type="submit"
              class="btn btn-secondary border border-primary d-flex align-items-center border-start-0"><p class="d-none d-md-block mb-0">Envoyer !</p>
              <BIconArrowRightSquare class="fs-4 ms-md-2" />
             </button>
@@ -127,7 +127,7 @@
 <!-- AFFICHAGE DES MESSAGES -->
               <div class="collapse" :id="'collapse'+posting.id"><hr>
                 <!-- BOUCLE POUR LES MESSAGES -->
-                <div v-for="comment in posting.Comments.slice().reverse()" :key="comment.createdAt">
+                <div v-for="comment in posting.Comments" :key="comment.createdAt">
                       <div  class="d-flex align-items-start" :id="'comment'+comment.id">
                               <img v-if="comment.UserId == null" class="thumbnailSM rounded border border-primary me-2" src="@/assets/defaultProfilPicture.jpeg" alt="">
                               <img v-else-if="comment.User.Ppicture == null" class="thumbnailSM rounded border border-primary me-2" src="@/assets/defaultProfilPicture.jpeg" alt="">
@@ -154,7 +154,7 @@
                               </div>
                       </div>
 <!-- BOUCLE POUR LES REPONSES DES MESSAGES -->
-                      <div v-for="comment in comment.Comments.slice().reverse()" :key="comment.createdAt">
+                      <div v-for="comment in comment.Comments" :key="comment.createdAt">
                         <div  class="d-flex align-items-start ms-5">
                               <img v-if="comment.UserId == null" class="thumbnailSM rounded border border-primary me-2" src="@/assets/defaultProfilPicture.jpeg" alt="">
                               <img v-else-if="comment.User.Ppicture == null" class="thumbnailSM rounded border border-primary me-2" src="@/assets/defaultProfilPicture.jpeg" alt="">
@@ -185,7 +185,7 @@
               </div>
 <!-- AFFICHAGE INPUT TEXT COMMENTAIRE -->
               <div id="sendingMessage" class="d-flex position-relative mt-3">
-                <div class="d-flex input-group position-relative">
+                <form class="d-flex input-group position-relative">
                   <div class="thumbnailMD">
                     <img v-if="$store.state.user.Ppicture" class="border-end-0 border border-primary rounded-start" :src="$store.state.user.Ppicture" height="50" width="50"/>
                     <img v-else class="border-end-0 border border-primary rounded-start p-1" src="@/assets/defaultProfilPicture.jpeg" alt="" height="50" width="50">
@@ -195,12 +195,12 @@
                   </div>
                   <input :id="'textComment'+posting.id" type="text" class="form-control border-start-0 border-end-0 border-primary" placeholder="Écrivez un commentaire"/>
                   <div class="border-top border-bottom border-primary d-flex align-items-center px-md-3 px-1">
-                    <button @click="emojiMessageToggle(posting)" class="fs-3 pointer mb-0 me-md-2 btn-none pe-1">&#128512; </button>
+                    <button @click="emojiMessageToggle(posting)" class="fs-3 pointer mb-0 me-md-2 btn-none pe-1" type="button">&#128512; </button>
                   </div>
-                  <button v-if="answering" @click="sendAnswer(posting)" type="button" class="btn btn-secondary border-primary d-flex align-items-center border-start-0">
+                  <button v-if="answering" @click.prevent="sendAnswer(posting)" type="submit" class="btn btn-secondary border-primary d-flex align-items-center border-start-0">
                     Répondre !<BIconArrowRightSquare class="fs-4 ms-2" />
                   </button>
-                  <button v-else @click="sendComment(posting)" type="button" class="btn btn-secondary border-primary d-flex align-items-center border-start-0">
+                  <button v-else @click.prevent="sendComment(posting)" type="submit" class="btn btn-secondary border-primary d-flex align-items-center border-start-0">
                     <p class="d-none d-md-block mb-0">Envoyer !</p><BIconArrowRightSquare class="fs-4 ms-md-2" />
                   </button>
                   <div v-if="emojiMessage == posting.id" id="emojiMessage">
@@ -208,7 +208,7 @@
                       <button @click="addEmojiMessage(emojiList, posting)" class="btn-none pointer" v-for="emojiList in emojiLists" :key="emojiList">{{emojiList}}</button>
                     </div>
                   </div>
-                </div>
+                </form>
               </div>
             </div>
           </li>
@@ -233,7 +233,7 @@ export default {
     return {
       router: useRouter(),
       text: '',
-      postings: {},
+      postings: [],
       to: ['posting', 'comment'],
       answering: false,
       answeringId: Number,
