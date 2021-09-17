@@ -2,7 +2,7 @@
       <div class="bg-light">
         <div class="d-flex justify-content-between align-items-center py-3">
         <router-link to="/">
-        <img class="logo" src="../assets/icon-left-font-corrected.svg" alt="" />
+        <img class="logo" src="../assets/icon-left-font-corrected.svg" alt="logo de groupomania" />
         </router-link>
         <div v-if="user.userId != -1" class="d-flex flex-column align-items-center position-relative">
             <div @click="menu = !menu" class="d-flex pointer">
@@ -11,8 +11,8 @@
                 <p v-if="user.service !== null" class="mb-0">@ {{user.service}}</p>
               </div>
               <div class="thumbnail border border-primary rounded overflow-hidden">
-                <img v-if="user.Ppicture != null" :src="$store.state.user.Ppicture" height="60" width="60" alt="" />
-                <img v-else class="rounded border" src="@/assets/defaultProfilPicture.jpeg" height="60" width="60" alt="" />
+                <img v-if="user.Ppicture != null" :src="$store.state.user.Ppicture" height="60" width="60" alt="photo de profil" />
+                <img v-else class="rounded border" src="@/assets/defaultProfilPicture.jpeg" height="60" width="60" alt="photo de profil par défaut" />
               </div>
             </div>
         </div>

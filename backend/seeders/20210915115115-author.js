@@ -7,7 +7,7 @@ module.exports = {
       surname: 'Blachere',
       email: 'olivier@blachere.fr',
       password: '$2b$04$T6skee8xO7rZh5YhFXySGOcyuZF7BOvSTjpVuIZ4MO12vqhNPNSeu',
-      Ppicture: 'http://localhost:3000/images/author.jpg',
+      Ppicture: process.env.SERVER+'/images/author.jpg',
       service: 'développeur Web',
       admin: 0,
       createdAt: new Date(),

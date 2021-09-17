@@ -4,8 +4,8 @@
       <div class="d-flex flex-column flex-lg-row align-items-center">
         <div class="d-flex position-relative me-lg-3">
           <div class="photo border border-primary rounded">
-            <img v-if="userProfil.Ppicture"  :src="userProfil.Ppicture"/>
-            <img v-else class="" src="@/assets/defaultProfilPicture.jpeg"/>
+            <img alt="photo de profil" v-if="userProfil.Ppicture"  :src="userProfil.Ppicture"/>
+            <img alt="photo de profil par défaut" v-else class="" src="@/assets/defaultProfilPicture.jpeg"/>
             <BIconTrash v-if="$store.state.user.admin == true || $store.state.user.userId == userProfil.id"
              @click="deletePhoto()" class="fs-2 pointer trash position-absolute"/>
             <BIconPencilSquare class="fs-2 change position-absolute"/>
@@ -18,13 +18,13 @@
           <li :class="list">
             <div class="d-flex justify-content-start align-items-center w-100">
               <div class="flex-shrink-0 me-2">Nom :</div> <div v-if="modifyToggle == false" class="ms-1">{{ userProfil.surname }}</div>
-              <input v-if="modifyToggle == true"  type="text" class="form-control" name="" v-model="userProfil.surname">
+              <input v-if="modifyToggle == true" type="text" class="form-control" name="nom" v-model="userProfil.surname">
             </div>
           </li>
           <li :class="list">
             <div class="d-flex justify-content-start align-items-center w-100">
               <div class="flex-shrink-0 me-2">Prénom :</div> <div v-if="modifyToggle == false" class="ms-1">{{ userProfil.name }}</div>
-              <input v-if="modifyToggle == true"  type="text" class="form-control" name="" v-model="userProfil.name">
+              <input v-if="modifyToggle == true" type="text" class="form-control" name="prénom" v-model="userProfil.name">
             </div>
           </li>
           <li :class="list">
@@ -45,7 +45,7 @@
           <li :class="list">
             <div  class="d-flex justify-content-start align-items-center w-100">
               <div class="flex-shrink-0 me-2">Adresse Mail :</div> <div v-if="modifyToggle == false" class="ms-1">{{ userProfil.email }}</div>
-              <input v-if="modifyToggle == true"  type="text" class="form-control" name=""  v-model="userProfil.email">
+              <input v-if="modifyToggle == true"  type="text" class="form-control" name="email"  v-model="userProfil.email">
             </div>
           </li>
           <li :class="list">
@@ -80,6 +80,12 @@
         <button type="button" @click="deletingAccount()" class="btn btn-light border border-primary mb-3">J'ai bien compris, je souhaite supprimer mon compte</button>
       </div>   
     </div>
+    <div v-if="userMessage" class="userMessage justify-content-center align-items-center">
+      <div class="fs-4 px-3 py-3 border border-primary rounded bg-light position-relative size text-wrap">
+        {{userMessageText}}
+        <button @click="userMessage = !userMessage" type="button" class="btn-close fs-6 position-absolute close" aria-label="Close"></button>
+      </div>
+    </div>
   </div>
   <div v-if="userProfil.id == null" class="fs-1 mt-5 text-center">Utilisateur inexistant</div>
 </template>
@@ -87,7 +93,7 @@
 <script>
 // import { ref } from '@vue/reactivity';
 const axios = require("axios").default;
-const instance = axios.create({baseURL: 'http://localhost:3000'})
+const instance = axios.create({baseURL: process.env.VUE_APP_SERVER})
 var passwordValidator = require('password-validator');
 var schema = new passwordValidator();
 schema
@@ -95,119 +101,133 @@ schema
 
 
 export default {
-    data() {
-      return {
-        list: "list-group-item d-flex justify-content-between align-items-center py-3",
-        user: localStorage.getItem('userId'),
-        token: localStorage.getItem('token'),
-        userProfilId : this.$route.params.id,
-        userProfil: {},
-        modifyToggle: false,
-        passwordToggle: false,
-        deleteToggle: false,
-        newPassword: '',
-        newPasswordVerif: '',
-        password: {},
-      };
+  data() {
+    return {
+      list: "list-group-item d-flex justify-content-between align-items-center py-3",
+      user: localStorage.getItem('userId'),
+      token: localStorage.getItem('token'),
+      userProfilId : this.$route.params.id,
+      userProfil: {},
+      modifyToggle: false,
+      passwordToggle: false,
+      deleteToggle: false,
+      newPassword: '',
+      newPasswordVerif: '',
+      password: {},
+      userMessage: false,
+      userMessageText : ''
+    };
+  },
+  methods:{
+    getUserInfo(){
+        instance.get("/users/" + this.userProfilId, { headers: { Authorization: 'bearer ' + this.token}})
+        .then((res) => {
+            this.userProfil = { admin: res.data.admin, id: res.data.id, surname: res.data.surname,
+            name: res.data.name, service: res.data.service, email: res.data.email,
+            Ppicture: res.data.Ppicture, creation: res.data.createdAt.slice(0,10),
+            };
+        })
+        .catch((json) => console.log(json));
     },
-    methods:{
-        getUserInfo(){
-            instance.get("/users/" + this.userProfilId, { headers: { Authorization: 'bearer ' + this.token}})
-            .then((res) => {
-                this.userProfil = { admin: res.data.admin, id: res.data.id, surname: res.data.surname,
-                name: res.data.name, service: res.data.service, email: res.data.email,
-                Ppicture: res.data.Ppicture, creation: res.data.createdAt.slice(0,10),
-                };
-            })
-            .catch((json) => console.log(json));
-        },
-        modifyProfil(){
-            this.modifyToggle = !this.modifyToggle
-        },
-        modifyPassword(){
-          this.passwordToggle = !this.passwordToggle
-        },
-        deleteAccount(){
-          this.deleteToggle = !this.deleteToggle
-        },
-        saveNewProfil(){
-          if(this.userProfilId != this.user && this.$store.state.user.admin == true){
-            instance.put('/users/' + this.userProfil.id, {email: this.userProfil.email, surname: this.userProfil.surname, name: this.userProfil.name, service: this.userProfil.service, Ppicture: this.userProfil.photo, password: this.userProfil.password}, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
-            .then(() => this.getUserInfo())
-            .catch((error) =>{console.log(error)})
-            this.modifyToggle = !this.modifyToggle}
-          else{
-            this.$store.dispatch('modifyProfil', this.userProfil)
-            .then(() => this.getUserInfo())
-            .catch(function (error){console.log(error)})
-            this.modifyToggle = !this.modifyToggle}
-        },
-        saveNewPassword(){
-          if((schema.validate(this.newPassword) && this.newPassword == this.newPasswordVerif) && (this.userProfilId == this.user || this.$store.state.user.admin == true)){
-            instance.put('/users/' + this.userProfil.id, {password: this.newPassword}, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
-            .then(() => this.getUserInfo())
-            .catch((error) =>{console.log(error)})
-            this.passwordToggle = false
-          }
-          else if(schema.validate(this.newPassword) && this.newPassword != this.newPasswordVerif){
-            this.password.nonEqual = true
-          }
-          else if(!schema.validate(this.newPassword)){
-            this.password.invalid = true
-          }
-        },
-        modifyPhoto(){
-          let fileEl = document.getElementById("modifyPhoto");
-          fileEl.click()
-        },
-        addPhoto(){
-          this.userProfil.Ppicture = this.$refs.Ppicture.files[0];
-          let formData = new FormData();
-          formData.append('image', this.userProfil.Ppicture)
-          instance.put("/users/" + this.userProfil.id + "/photo", formData, { headers: {  Authorization: 'bearer ' + localStorage.getItem('token') }})
-          .then(() => {
-            this.$store.dispatch('getUser', {
-            id: localStorage.getItem('userId'),
-            token: localStorage.getItem('token')})
-            .then(() => { this.getUserInfo() })
-            .catch()
-          })
-          .catch((json) => console.log(json));
-        },
-        deletePhoto(){
-          if(this.userProfil.Ppicture){
-            instance.delete("/users/" + this.userProfil.id + "/photo", { headers: {  Authorization: 'bearer ' + localStorage.getItem('token') }})
-          .then(() => {
-            this.$store.dispatch('getUser', {
-            id: localStorage.getItem('userId'),
-            token: localStorage.getItem('token')})
-            .then(() => { this.getUserInfo() })
-            .catch()
-          })
-          .catch((json) => console.log(json));
-          }
-          else{
-            console.log('pas de photo à supprimer')
-          }
-          
-        },
-        deletingAccount(){
-          instance.delete("/users/" + this.userProfil.id,{ headers: {  Authorization: 'bearer ' + localStorage.getItem('token') }})
-          .then(() => {
-            if(this.$store.state.user.admin == true){
-              this.$router.push("/administration");
-            }
-            else{
-            this.$store.state.user.userId = -1;
-            localStorage.removeItem("userId");
-            localStorage.removeItem("token");
-            this.$router.push("/connexion");
-            }
-          })
-          .catch((json) => console.log(json));
+    modifyProfil(){
+        this.modifyToggle = !this.modifyToggle
+    },
+    modifyPassword(){
+      this.passwordToggle = !this.passwordToggle
+    },
+    deleteAccount(){
+      this.deleteToggle = !this.deleteToggle
+    },
+    saveNewProfil(){
+       let message = "✅ Profil modifié avec succès"
+      if(this.userProfilId != this.user && this.$store.state.user.admin == true){
+        instance.put('/users/' + this.userProfil.id, {email: this.userProfil.email, surname: this.userProfil.surname, name: this.userProfil.name, service: this.userProfil.service, Ppicture: this.userProfil.photo, password: this.userProfil.password}, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
+        .then(() => this.getUserInfo())
+        .catch((error) =>{console.log(error)})
+        this.modifyToggle = !this.modifyToggle;
+        this.modal()}
+      else{
+        this.$store.dispatch('modifyProfil', this.userProfil)
+        .then(() => this.getUserInfo())
+        .catch(function (error){console.log(error)})
+        this.modifyToggle = !this.modifyToggle;
+        this.modal(message)}
+    },
+    saveNewPassword(){
+      if((schema.validate(this.newPassword) && this.newPassword == this.newPasswordVerif) && (this.userProfilId == this.user || this.$store.state.user.admin == true)){
+        instance.put('/users/' + this.userProfil.id, {password: this.newPassword}, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
+        .then(() => {
+          this.getUserInfo();
+          let message = "✅ Mot de passe changé avec succès"
+          this.modal(message)})
+        .catch((error) =>{console.log(error)})
+        this.passwordToggle = false
+      }
+      else if(schema.validate(this.newPassword) && this.newPassword != this.newPasswordVerif){
+        this.password.nonEqual = true
+      }
+      else if(!schema.validate(this.newPassword)){
+        this.password.invalid = true
+      }
+    },
+    modifyPhoto(){
+      let fileEl = document.getElementById("modifyPhoto");
+      fileEl.click()
+    },
+    addPhoto(){
+      this.userProfil.Ppicture = this.$refs.Ppicture.files[0];
+      let formData = new FormData();
+      formData.append('image', this.userProfil.Ppicture)
+      instance.put("/users/" + this.userProfil.id + "/photo", formData, { headers: {  Authorization: 'bearer ' + localStorage.getItem('token') }})
+      .then(() => {
+        this.$store.dispatch('getUser', {
+        id: localStorage.getItem('userId'),
+        token: localStorage.getItem('token')})
+        .then(() => {
+          this.getUserInfo();
+          let message = "✅ Photo de profil modifiée avec succès"
+          this.modal(message)})
+        .catch()
+      })
+      .catch((json) => console.log(json));
+    },
+    deletePhoto(){
+      if(this.userProfil.Ppicture){
+        instance.delete("/users/" + this.userProfil.id + "/photo", { headers: {  Authorization: 'bearer ' + localStorage.getItem('token') }})
+        .then(() => {
+          this.$store.dispatch('getUser', {id: localStorage.getItem('userId'),token: localStorage.getItem('token')})
+          .then(() => { this.getUserInfo(); let message = "✅ Photo de profil supprimée avec succès"; this.modal(message) })
+          .catch((error) => console.log(error))
+        })
+        .catch((json) => console.log(json));
+      }
+      else{
+        let message = "❌ il n'y a pas de photo à supprimer"
+        this.modal(message)
+      }
+      
+    },
+    deletingAccount(){
+      instance.delete("/users/" + this.userProfil.id,{ headers: {  Authorization: 'bearer ' + localStorage.getItem('token') }})
+      .then(() => {
+        if(this.$store.state.user.admin == true){
+          this.$router.push("/administration");
         }
+        else{
+        this.$store.state.user.userId = -1;
+        localStorage.removeItem("userId");
+        localStorage.removeItem("token");
+        this.$router.push("/connexion");
+        }
+      })
+      .catch((json) => console.log(json));
     },
-    beforeMount(){this.getUserInfo()},
+    modal(message){
+      this.userMessage = true;
+      this.userMessageText = message
+    }
+  },
+  beforeMount(){this.getUserInfo()},
 }
 </script>
 
@@ -255,5 +275,23 @@ li{
 }
 select option[selected]{
     background-color: rgb(235, 204, 204)
+}
+.userMessage{
+  display: flex;
+  position: fixed;
+  z-index: 10000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgb(0,0,0);
+  background-color: rgba(0,0,0,0.4);
+}
+.close{
+  top:.2rem;
+  right:.2rem;
+}
+.size{
+  max-width: 300px;
 }
 </style>

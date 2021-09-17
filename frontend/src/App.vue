@@ -33,7 +33,7 @@ body::-webkit-scrollbar {
 // PERSONNALISATION BOOTSTRAP
 $primary : #e94426;
 $secondary : #ebcccc;
-$border-radius: .3rem;
+$border-radius: .35rem;
 $dark: rgb(40,40,40);
 $input-focus-bg: rgba(0, 0, 0, 0);
 @import "../node_modules/bootstrap/scss/bootstrap.scss";

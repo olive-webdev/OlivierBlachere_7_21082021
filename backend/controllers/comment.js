@@ -17,7 +17,7 @@ exports.deleteComment = (req, res) => {
     const id           = req.params.id;
     const idComment    = req.params.idcomment;
     const token        = req.headers.authorization.split(' ')[1];
-    const decodedToken = jwt.verify(token, "privateKey");
+    const decodedToken = jwt.verify(token, process.env.TOKEN_PRIVATE_KEY);
     const userId       = decodedToken.userId;
     models.User.findOne({where: {id : userId}})
     .then((User) => {

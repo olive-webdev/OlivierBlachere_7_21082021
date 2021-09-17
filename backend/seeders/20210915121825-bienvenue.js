@@ -5,7 +5,7 @@ module.exports = {
     return queryInterface.bulkInsert('Postings', [{
       userId: 2,
       text: "Bienvenue sur le réseau social de Groupomania, j'espère qu'il vous plaira 😊.",
-      image: 'http://localhost:3000/images/bienvenue.gif',
+      image: process.env.SERVER+'/images/bienvenue.gif',
       createdAt: new Date(),
       updatedAt: new Date()
     }]);

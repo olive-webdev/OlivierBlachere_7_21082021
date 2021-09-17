@@ -55,7 +55,7 @@ exports.modifyPosting = (req, res) => {
     const id = req.params.id;
     const idPosting = req.params.idPosting;
     const token = req.headers.authorization.split(' ')[1];
-    const decodedToken = jwt.verify(token, "privateKey");
+    const decodedToken = jwt.verify(token, process.env.TOKEN_PRIVATE_KEY);
     const userId = decodedToken.userId;
     models.User.findOne({where: {id : userId}})
     .then((User) => {
@@ -85,7 +85,7 @@ exports.deletePosting = (req, res) => {
     const id           = req.params.id;
     const idPosting    = req.params.idPosting;
     const token        = req.headers.authorization.split(' ')[1];
-    const decodedToken = jwt.verify(token, "privateKey");
+    const decodedToken = jwt.verify(token, process.env.TOKEN_PRIVATE_KEY);
     const userId       = decodedToken.userId;
     models.User.findOne({where: {id : userId}})
     .then((User) => {

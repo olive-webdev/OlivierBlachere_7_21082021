@@ -7,7 +7,7 @@
           <h1 class="ms-3">Groupomania a désormais son réseau social</h1>
           <h2 class="text-center mt-3 mx-2">Partagez avec vos collègues !</h2>
           <div class="d-flex flex-column flex-lg-row align-items-center">
-            <img src="@/assets/screenshot.png" alt="" class="shadow rounded m-5 mb-2 imageSize mx-3">
+            <img src="@/assets/screenshot.png" alt="photo d'écran du réseau social groupomania" class="shadow rounded m-5 mb-2 imageSize mx-3">
             <div class="d-flex flex-column m-lg-5 ms-0">
               <p class="my-3 fs-5 text-dark">Postez des messages, agrémentez en incluant des images</p>
               <p class="my-3 fs-5 text-dark">Commentez, likez les posts de vos collègues</p>

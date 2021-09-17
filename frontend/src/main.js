@@ -30,6 +30,4 @@ app.component("BIconExclamationSquareFill", BIconExclamationSquareFill);
 app.component("BIconXSquare", BIconXSquare);
 app.component("BIconBoxArrowRight", BIconBoxArrowRight);
 
-
-
 app.use(store).use(router).mount("#app");

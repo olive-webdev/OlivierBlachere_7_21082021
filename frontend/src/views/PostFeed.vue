@@ -8,7 +8,7 @@
       <div class="col-lg-9 mt-3 col-12">
 <!-- AFFICHAGE QUOI DE NEUF -->
         <div class="bg-white rounded d-flex flex-column px-md-4 py-md-3 mb-4 border">
-          <div class="d-flex input-group">
+          <form class="d-flex input-group">
             <div class="thumbnailMD">
               <img v-if="$store.state.user.Ppicture" class="thumbnailMD border-end-0 border border-primary rounded-start" :src="$store.state.user.Ppicture"/>
               <img v-else class="thumbnailMD border-end-0 border border-primary rounded-start p-1" src="@/assets/defaultProfilPicture.jpeg" alt="">
@@ -17,19 +17,19 @@
             <input v-model="text" type="text" class="form-control border-start-0 border-end-0 border-primary pe-0" aria-describedby="quoi de neuf"
             :placeholder="'Quoi de neuf ' + $store.state.user.name + ' ?'"/>
             <div class="border-top border-bottom border-primary d-flex align-items-center px-md-3">
-              <button @click="emoji = !emoji" class="fs-3 pointer mb-0 me-md-2 btn-none pe-0">&#128512; </button>
-              <button @click="loadPhoto()" class="fs-3 pointer mb-0 btn-none">&#127748; </button>
+              <button @click="emoji = !emoji" class="fs-3 pointer mb-0 me-md-2 btn-none pe-0" type="button">&#128512; </button>
+              <button @click="loadPhoto()" class="fs-3 pointer mb-0 btn-none" type="button">&#127748; </button>
             </div>
             <input @change="addPhoto()" type="file" id="addingPhoto" class="inputfile"/>
-            <button @click="send()" type="button"
+            <button @click="send()" type="submit"
              class="btn btn-secondary border border-primary d-flex align-items-center border-start-0"><p class="d-none d-md-block mb-0">Envoyer !</p>
              <BIconArrowRightSquare class="fs-4 ms-md-2" />
             </button>
-          </div>
+          </form>
           <div v-if="emoji" id="emoji">
-            <ul class="d-flex fs-3 mb-0 p-3 pb-0 flex-wrap">
-              <li @click="addEmoji(emojiList)" class="mx-1 pointer" v-for="emojiList in emojiLists" :key="emojiList">{{emojiList}}</li>
-            </ul>
+            <div class="d-flex fs-3 mb-0 p-3 pb-0 flex-wrap justify-content-between">
+              <button @click="addEmoji(emojiList)" class="pointer btn-none" v-for="emojiList in emojiLists" :key="emojiList">{{emojiList}}</button>
+            </div>
           </div>
           <div v-if="url" id="photo">
             <div id="preview">
@@ -185,7 +185,7 @@
               </div>
 <!-- AFFICHAGE INPUT TEXT COMMENTAIRE -->
               <div id="sendingMessage" class="d-flex position-relative mt-3">
-                <div class="d-flex input-group position-relative ">
+                <div class="d-flex input-group position-relative">
                   <div class="thumbnailMD">
                     <img v-if="$store.state.user.Ppicture" class="border-end-0 border border-primary rounded-start" :src="$store.state.user.Ppicture" height="50" width="50"/>
                     <img v-else class="border-end-0 border border-primary rounded-start p-1" src="@/assets/defaultProfilPicture.jpeg" alt="" height="50" width="50">
@@ -204,9 +204,9 @@
                     <p class="d-none d-md-block mb-0">Envoyer !</p><BIconArrowRightSquare class="fs-4 ms-md-2" />
                   </button>
                   <div v-if="emojiMessage == posting.id" id="emojiMessage">
-                    <ul class="d-flex fs-3 mb-0 mt-2 flex-wrap">
-                      <li @click="addEmojiMessage(emojiList, posting)" class="mx-1 pointer" v-for="emojiList in emojiLists" :key="emojiList">{{emojiList}}</li>
-                    </ul>
+                    <div class="d-flex fs-3 mb-0 p-3 pb-0 flex-wrap justify-content-between">
+                      <button @click="addEmojiMessage(emojiList, posting)" class="btn-none pointer" v-for="emojiList in emojiLists" :key="emojiList">{{emojiList}}</button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -222,7 +222,7 @@ import Header from "../components/Header.vue";
 import Menu from "../components/Menu.vue";
 import { useRouter } from "vue-router";
 const axios = require("axios").default;
-const instance = axios.create({baseURL: 'http://localhost:3000'})
+const instance = axios.create({baseURL: process.env.VUE_APP_SERVER})
 export default {
   name: "PostFeed",
   components: {
@@ -465,13 +465,19 @@ ul{
   top : 3rem;
   right: 2rem;
 }
-#emoji li:hover{
-  width: 28px;
-  height: 28px;
+#emoji button, #emojiMessage button{
+  margin: 0;
+  padding: 0;
+  width: 3rem;
+  height: 3rem;
+}
+#emoji button:hover, #emojiMessage button:hover{
+  width: 3rem;
+  height: 3rem;
   position: relative;
   top: -1rem;
-  left: -.6rem;
-  font-size: 3rem;
+  left: -.3rem;
+  font-size: 3.5rem;
 }
 .likes  ul{
   display: none;

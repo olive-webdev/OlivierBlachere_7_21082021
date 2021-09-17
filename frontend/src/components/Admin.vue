@@ -33,7 +33,7 @@
 
 <script>
 const axios = require("axios").default;
-const instance = axios.create({baseURL: 'http://localhost:3000'})
+const instance = axios.create({baseURL: process.env.VUE_APP_SERVER})
 export default {
   data(){
       return{

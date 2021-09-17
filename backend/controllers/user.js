@@ -49,7 +49,7 @@ exports.login = (req, res) => {
                 .then(function(result){
                     if(result === true)
                         {res.status(200).json( //renvoie de l'ID utilisateur et du TOKEN
-                            { userId: User.id, token: jwt.sign({userId: User.id}, "privateKey", { expiresIn: "9h"}),
+                            { userId: User.id, token: jwt.sign({userId: User.id}, process.env.TOKEN_PRIVATE_KEY, { expiresIn: "9h"}),
                              name: User.name, surname: User.surname, email: User.email, service: User.service, Ppicture: User.Ppicture, admin: User.admin, creation: User.createdAt});}
                     else{res.status(400).send("mauvais mot de passe")}
                 })
@@ -78,7 +78,7 @@ exports.getOneUser = (req, res) => { //renvoie les information d'un utilisateur
 exports.modifyUser = (req, res) => {
     const id = req.params.id;
     const token = req.headers.authorization.split(' ')[1];
-    const decodedToken = jwt.verify(token, "privateKey");
+    const decodedToken = jwt.verify(token, process.env.TOKEN_PRIVATE_KEY);
     const userId = decodedToken.userId;
     models.User.findOne({where: {id : userId}})
     .then((User) => {
@@ -105,7 +105,7 @@ exports.modifyUser = (req, res) => {
 exports.modifyPhoto = (req, res) => {
     const id = req.params.id;
     const token = req.headers.authorization.split(' ')[1];
-    const decodedToken = jwt.verify(token, "privateKey");
+    const decodedToken = jwt.verify(token, process.env.TOKEN_PRIVATE_KEY);
     const userId = decodedToken.userId;
     models.User.findOne({where: {id : userId}})
     .then((User) => {
@@ -139,7 +139,7 @@ exports.modifyPhoto = (req, res) => {
 exports.deletePhoto = (req, res) => {
     const id = req.params.id;
     const token = req.headers.authorization.split(' ')[1];
-    const decodedToken = jwt.verify(token, "privateKey");
+    const decodedToken = jwt.verify(token, process.env.TOKEN_PRIVATE_KEY);
     const userId = decodedToken.userId;
     models.User.findOne({where: {id : userId}})
     .then((User) => {
@@ -166,7 +166,7 @@ exports.deletePhoto = (req, res) => {
 exports.deleteUser = (req, res) => {
     const id = req.params.id;
     const token = req.headers.authorization.split(' ')[1];
-    const decodedToken = jwt.verify(token, "privateKey");
+    const decodedToken = jwt.verify(token, process.env.TOKEN_PRIVATE_KEY);
     const userId = decodedToken.userId;   
     models.User.findOne({where: {id : userId}})
     .then((User) => {
