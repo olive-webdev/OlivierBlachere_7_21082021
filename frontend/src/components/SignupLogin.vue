@@ -86,7 +86,6 @@ export default {
             }else this.validPrenom = false;
         },
         login(){
-            console.log(process.env.VUE_APP_SERVER)
             const self = this;
             this.$store.dispatch('login', {
             email: this.email,
