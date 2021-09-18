@@ -164,10 +164,10 @@ exports.deletePhoto = (req, res) => {
     .catch(() => res.status(500).json({ 'error': "impossible de supprimer la photo"}))
 };
 exports.deleteUser = (req, res) => {
-    const id = req.params.id;
-    const token = req.headers.authorization.split(' ')[1];
+    const id           = req.params.id;
+    const token        = req.headers.authorization.split(' ')[1];
     const decodedToken = jwt.verify(token, process.env.TOKEN_PRIVATE_KEY);
-    const userId = decodedToken.userId;   
+    const userId       = decodedToken.userId;   
     models.User.findOne({where: {id : userId}})
     .then((User) => {
         let administrator = User.admin ? true : false;
@@ -179,6 +179,18 @@ exports.deleteUser = (req, res) => {
                         if(User.Ppicture != null){
                         const filename = User.Ppicture.split('/images/')[1];// suppression de la photo de profil
                         fs.unlink(`./images/${filename}`, (err) =>{console.log(err)})}
+                        models.Posting.findAll({where: { userId: id }})
+                            .then((Postings) => {
+                                Postings.forEach((Posting) => {
+                                    console.log(Posting.image)
+                                    if(Posting.image != null){
+                                    const filename = Posting.image.split('/images/')[1]; // suppression de l'image de la publication
+                                    fs.unlink(`images/${filename}`, (err) =>{console.log('suppression image '+err)})
+                                    }
+                                })
+                            })
+                            .catch(() => res.status(500).json({ 'error': "erreur à la suppression de l'image de la publication" }))
+
                         models.User.destroy({where: { id : id }})
                             .then(() => res.status(200).json({'message' : "utilisateur supprimé par l'utilisateur"}))
                             .catch((error) => res.status(500).json(error));

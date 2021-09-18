@@ -106,7 +106,7 @@ exports.deletePosting = (req, res) => {
                             .catch(() => res.status(500).json({ 'error': "erreur à la suppression de la publication" }))
                         }
                     })
-                .catch(() => res.status(500).json({ 'error': "erreur à la suppression gjghfjde la publication" }))
+                .catch(() => res.status(500).json({ 'error': "erreur à la suppression de la publication" }))
             }
         else{res.status(500).json({ 'error': "vous devez être administrateur pour effectuer cette opération"});}
         })
