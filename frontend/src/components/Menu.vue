@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white d-flex justify-content-center border rounded">
+  <div v-if="$store.state.user.userId != -1" class="bg-white d-flex justify-content-center border rounded">
     <div id="navigation" class="p-0 my-0 w-100">
       <router-link class="" to="/postfeed">
         <div class="d-flex justify-content-between align-items-center py-3 rounded-top" >
@@ -45,14 +45,14 @@ export default {
   methods:{
     getReports(){
       this.$store.dispatch('reports')
-      .then(console.log(this.$store.state.reports+'signalement(s)'))
+      .then(console.log(this.$store.state.reports+' signalement(s)'))
       .catch(function (error){console.log(error)})
     },
     disconnect(){
       localStorage.removeItem('token');
       localStorage.removeItem('userId');
       this.$store.dispatch('logout')
-      .then(() => { console.log('utilisateur déconnecté') })
+      .then(() => { console.log('Déconnexion utilisateur') })
       .catch()
     }
   },

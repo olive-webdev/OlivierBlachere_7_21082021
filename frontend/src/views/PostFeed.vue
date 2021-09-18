@@ -269,7 +269,7 @@ export default {
     modifyPosting(posting){
       let formData = new FormData();
       if(posting.imageDeleted == undefined){posting.imageDeleted = false}
-      if(posting.imageDeleted == true){this.image = null}
+      if(posting.imageDeleted == true){this.image = 'deleted'}
       else{this.image = document.getElementById(posting.id).files[0]}
       formData.append('image', this.image)
       formData.append('text', document.getElementById("textModified").value)
@@ -280,7 +280,7 @@ export default {
     },
     getAllPost(){
       instance.get('/postings/', { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
-      .then((response)=>{this.postings = response.data; this.comments = response.data.Comments; console.log(response.data)})
+      .then((response)=>{this.postings = response.data; this.comments = response.data.Comments})
       .catch((error) =>{console.log(error)})
     },
     deletePost(id, user){
@@ -393,16 +393,15 @@ export default {
   },
   beforeMount: function() {
     if (!this.$store.state.user.token && !localStorage.getItem("token")) {
+      this.$store.state.user.userId = -1;
       this.$router.push("/connexion");
-      console.log("utilisateur non connecté");
+      console.log("utilisateur non authentifié");
     } else if (!this.$store.state.user.token && localStorage.getItem("token")) {
-      this.$store
-        .dispatch("getUser", {
+      this.$store.dispatch("getUser", {
           id: localStorage.getItem("userId"),
           token: localStorage.getItem("token"),
         })
-        .then(() => {
-          console.log("utilisateur connecté");
+        .then(() => {console.log("utilisateur authentifié");
         })
         .catch();
     } else {
@@ -464,6 +463,8 @@ ul{
 .trash{
   top : 3rem;
   right: 2rem;
+  color: rgb(233, 68, 38);
+  padding: .2rem;
 }
 #emoji button, #emojiMessage button{
   margin: 0;

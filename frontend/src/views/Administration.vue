@@ -8,7 +8,7 @@
       <div v-if="$store.state.user.admin" class="col-lg-9 col-12 mt-3">
         <Admin />
       </div>
-      <div v-else class="col-lg-9 col-12 mt-3 fs-3">Vous devez être administrateur pour accéder à cette page</div>
+      <div v-else class="col-lg-9 col-12 mt-5 fs-3 text-center px-5">Vous devez être administrateur pour accéder à cette page</div>
     </div>
   </div>
 </template>
@@ -28,7 +28,7 @@ export default {
   beforeMount: function(){
     if(!this.$store.state.user.token && !localStorage.getItem('token')){
       this.$router.push("/connexion")
-      console.log("utilisateur non connecté")
+      console.log("utilisateur non authentifié")
     }
     else if(!this.$store.state.user.token && localStorage.getItem('token')){
       this.$store.dispatch('getUser', {

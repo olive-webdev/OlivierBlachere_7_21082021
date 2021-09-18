@@ -61,7 +61,7 @@ export default {
   beforeMount: function() {
   if (!this.$store.state.user.token && !localStorage.getItem("token")) {
     this.$router.push("/connexion");
-    console.log("utilisateur non connecté");
+    console.log("utilisateur non authentifié");
   } else if (!this.$store.state.user.token && localStorage.getItem("token")) {
     this.$store
       .dispatch("getUser", {
@@ -69,7 +69,7 @@ export default {
         token: localStorage.getItem("token"),
       })
       .then(() => {
-        console.log("utilisateur connecté");this.getAllReports()
+        console.log("utilisateur authentifié");this.getAllReports()
       })
       .catch();
   } else {

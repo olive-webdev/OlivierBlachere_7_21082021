@@ -69,10 +69,13 @@ exports.modifyPosting = (req, res) => {
                             const filename = Posting.image.split('/images/')[1]; // suppression de l'ancienne image
                             fs.unlink(`images/${filename}`, (err) =>{console.log(err)})
                         }
-                        req.file === undefined ? Posting.image = null : Posting.image = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+                        if(req.file == undefined && Posting.image == null){Posting.image = null}
+                        else if(req.body.image == 'deleted'){Posting.image = null}
+                        else if(req.file === undefined && Posting.image != null){Posting.image = Posting.image}
+                        else{Posting.image = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`};
                         Posting.text = req.body.text;
                         Posting.save();
-                        res.status(200).json({ 'message': "publication avec image modifiée par l'utilisateur"});
+                        res.status(200).json({ 'message': "publication avec image modifiée"});
                     }
                 })
                 .catch(() => res.status(500).json({ 'error': "erreur modification impossible" }));
