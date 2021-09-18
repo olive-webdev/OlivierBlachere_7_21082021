@@ -7,7 +7,7 @@ module.exports = {
       surname: 'Openclassrooms',
       email: 'mentor@openclassrooms.fr',
       password: '$2b$04$T6skee8xO7rZh5YhFXySGOcyuZF7BOvSTjpVuIZ4MO12vqhNPNSeu',
-      Ppicture: process.env.SERVER+'/images/Logo_OpenClassrooms.png',
+      Ppicture: process.env.SERVER+'/images/openClassrooms.png',
       service: 'administrateur',
       admin: 1,
       createdAt: new Date(),
