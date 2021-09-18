@@ -53,6 +53,7 @@
           </li>
         </ul>
       </div>
+<!-- MODIFY PROFIL -->
       <div v-if="userProfil.id == user || $store.state.user.admin == true" class="d-flex flex-column flex-lg-row justify-content-end align-items-center py-3">
         <button v-if="modifyToggle == false" @click="modifyProfil()" class="btn btn-secondary border border-primary w-100 my-2 me-lg-2">Modifier le profil</button>
         <button v-if="modifyToggle == true" @click="saveNewProfil()" class="btn btn-secondary border border-primary w-100 text-nowrap my-2 me-lg-2">Enregistrer les modifications</button>
@@ -61,14 +62,15 @@
         <button class="btn btn-secondary border border-primary w-100 my-2 me-lg-2" role="button" @click="modifyPassword()">Changer le mot de passe</button>
         <button class="btn btn-secondary border border-primary w-100 my-2" role="button" @click="deleteAccount()">Supprimer le compte</button>
       </div >
+
       <form v-if="passwordToggle == true" class="mt-4 w-50 align-self-center">
         <div class="my-3">
           <label for="Password" class="form-label">Entrer votre nouveau mot de passe</label>
-          <input v-model="newPassword" type="password" class="form-control" id="Password">
+          <input v-model="newPassword" type="password" class="form-control" id="Password" @focus="password.nonEqual = false; password.invalid = false">
         </div>
         <div class="mb-3">
           <label for="PasswordVerif" class="form-label">Confirmer votre nouveau mot de passe</label>
-          <input v-model="newPasswordVerif" type="password" class="form-control" id="PasswordVerif">
+          <input v-model="newPasswordVerif" type="password" class="form-control" id="PasswordVerif" @focus="password.nonEqual = false; password.invalid = false">
         </div>
         <p v-if="password.invalid" class="text-danger">Le mot de passe est invalide, il doit contenir au moins 8 caractères, des chiffres, des majuscules et minuscules.</p>
         <p v-if="password.nonEqual" class="text-danger">Les mots de passe ne correspondent pas. Vérifier votre saisie.</p>
@@ -80,6 +82,7 @@
         <button type="button" @click="deletingAccount()" class="btn btn-light border border-primary mb-3">J'ai bien compris, je souhaite supprimer mon compte</button>
       </div>   
     </div>
+<!-- MESSAGE POPUP -->
     <transition name="fade">
       <div v-if="userMessage" id="userMessage" class="userMessage d-flex position-fixed justify-content-center align-items-center w-100 h-100">
       <div class="fs-4 px-3 py-3 border border-primary rounded bg-light position-relative size text-wrap">
