@@ -19,7 +19,7 @@ exports.getAllPostings = (req, res) => {
             {model: models.Comment, include:[models.Like, models.Report, models.User, {model: models.Comment, include:[models.User, models.Like, models.Report], order:[[models.Comment, 'createdAt', 'DESC']]}]},
             {model: models.Like, include:[models.User]},
             {model: models.Report, include:[models.User]}
-        ], order:[[models.Comment, 'createdAt', 'ASC']]}
+        ], order:[[models.Comment, 'createdAt', 'ASC'],[models.Comment,models.Comment, 'createdAt', 'ASC']]}
     )
     .then((Postings) => res.status(200).json(Postings))
     .catch(() => res.status(500).json({ 'error': "erreur à l'obtention des posts" }));
