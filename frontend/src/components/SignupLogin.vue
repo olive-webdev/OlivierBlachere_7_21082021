@@ -7,25 +7,25 @@
                 <div v-if="status == 'errorSignup'" class="text-danger mb-4">Impossible de créer ce compte, utilisateur déjà enregistré</div>
                 <div class="mb-3 text-center">
                     <label for="InputEmail" class="form-label" >Adresse Email</label >
-                    <input v-model="email" @change="validationEmail()" type="email" class="form-control " id="InputEmail" aria-describedby="emailHelp"
+                    <input v-model="email" @change="validationEmail()" type="email" @focus="validEmail = true" class="form-control " id="InputEmail" aria-describedby="emailHelp"
                     placeholder="Entrer votre email..." />
                     <div v-if="!validEmail" class="form-text text-danger">L'email n'est pas valide</div>
                 </div>
-                <div v-if="!toggle || $route.params.logorsign === 'signup'" class="mb-3 text-center">
+                <div v-if="$route.params.logorsign === 'signup'" class="mb-3 text-center">
                     <label for="InputSurname" class="form-label" >Nom</label >
-                    <input v-model="nom" @change="validationNom()" type="text" class="form-control " id="InputSurname" aria-describedby="emailHelp"
+                    <input v-model="nom" @change="validationNom()" type="text" @focus="validNom = true" class="form-control " id="InputSurname" aria-describedby="emailHelp"
                     placeholder="Entrer votre nom..." />
                     <div v-if="!validNom" class="form-text text-danger">Le nom doit être renseigné</div>
                 </div>
-                <div v-if="!toggle || $route.params.logorsign === 'signup'" class="mb-3 text-center">
+                <div v-if="$route.params.logorsign === 'signup'" class="mb-3 text-center">
                     <label for="InputName" class="form-label" >Prénom</label >
-                    <input v-model="prenom" @change="validationPrenom()" type="text" class="form-control " id="InputName" aria-describedby="emailHelp"
+                    <input v-model="prenom" @change="validationPrenom()" type="text" @focus="validPrenom = true" class="form-control " id="InputName" aria-describedby="emailHelp"
                     placeholder="Entrer votre prénom..." />
                     <div v-if="!validPrenom" class="form-text text-danger">Le prénom doit être renseigné</div>
                 </div>
                 <div class="mb-3 text-center">
                     <label for="InputPassword" class="form-label" >Mot de passe</label>
-                    <input v-model="password" @change="validationPassword()" type="password" class="form-control " id="InputPassword"
+                    <input v-model="password" @change="validationPassword()" @focus="validPassword = true" type="password" class="form-control " id="InputPassword"
                     placeholder="Entrer votre mot de passe" />
                     <div v-if="!validPassword" class="form-text text-danger">Le mot de passe n'est pas valide,
                          il doit comporter au moins 8 caractères dont un chiffre, des minuscules et majuscules</div>
@@ -54,15 +54,14 @@ schema
 export default {
     data(){
         return{
-            toggle: true,email: ref(''),password: ref(''),nom: ref(''),prenom: ref(''),
+            email: ref(''),password: ref(''),nom: ref(''),prenom: ref(''),
             validEmail: Boolean,validPassword: Boolean,validNom: Boolean,validPrenom: Boolean,
         }
     },
     computed:{
         validForm: function(){
-            if(this.toggle && validator.validate(this.email) && schema.validate(this.password)){return true;}
-            else if(!this.toggle && validator.validate(this.email) &&
-             schema.validate(this.password) && this.nom.length > 2 && this.prenom.length > 2){return true;}
+            if(this.$route.params.logorsign == 'login' && validator.validate(this.email) && schema.validate(this.password)){return true;}
+            else if(this.$route.params.logorsign == 'signup' && validator.validate(this.email) && schema.validate(this.password) && this.nom.length > 2 && this.prenom.length > 2){return true;}
             else{return false;}
         },
         ...mapState(['status'])
