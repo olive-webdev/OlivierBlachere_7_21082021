@@ -47,7 +47,7 @@
         </div>
         <ul id="postings">
 <!-- AFFICHAGE DU POST -->
-          <li v-for="posting in postings.slice().reverse()" :key="posting.id" :id='"post"+posting.id'>
+          <li v-for="posting in postings" :key="posting.id" :id='"post"+posting.id'>
             <div class="bg-white rounded d-flex pt-3 flex-column p-md-4 p-2 mb-4  border">
               <div class="d-flex justify-content-between border-bottom border-secondary pb-2">
                 <div class="rounded border border-primary overflow-hidden thumbnail rounded">
