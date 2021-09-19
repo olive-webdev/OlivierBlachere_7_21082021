@@ -1,41 +1,43 @@
 <template>
     <div class="d-flex justify-content-center">
-        <div id="login" class="bg-white rounded px-5 shadow mt-0 mt-lg-5 d-flex flex-column align-center">
+        <div id="login" class="bg-white rounded px-5 shadow mt-0 mt-lg-5 d-flex flex-column align-items-center">
             <img src="@/assets/icon.svg" height="150" alt="" class="my-3 mx-auto" />
             <form @submit.prevent="">
                 <div v-if="status == 'errorLogin'" class="text-danger mb-4">Impossible de se connecter, vérifier votre email et votre mot de passe</div>
                 <div v-if="status == 'errorSignup'" class="text-danger mb-4">Impossible de créer ce compte, utilisateur déjà enregistré</div>
-                <div class="mb-3">
+                <div class="mb-3 text-center">
                     <label for="InputEmail" class="form-label" >Adresse Email</label >
                     <input v-model="email" @change="validationEmail()" type="email" class="form-control " id="InputEmail" aria-describedby="emailHelp"
                     placeholder="Entrer votre email..." />
                     <div v-if="!validEmail" class="form-text text-danger">L'email n'est pas valide</div>
                 </div>
-                <div v-if="!toggle" class="mb-3">
+                <div v-if="!toggle || $route.params.logorsign === 'signup'" class="mb-3 text-center">
                     <label for="InputSurname" class="form-label" >Nom</label >
                     <input v-model="nom" @change="validationNom()" type="text" class="form-control " id="InputSurname" aria-describedby="emailHelp"
                     placeholder="Entrer votre nom..." />
                     <div v-if="!validNom" class="form-text text-danger">Le nom doit être renseigné</div>
                 </div>
-                <div v-if="!toggle" class="mb-3">
+                <div v-if="!toggle || $route.params.logorsign === 'signup'" class="mb-3 text-center">
                     <label for="InputName" class="form-label" >Prénom</label >
                     <input v-model="prenom" @change="validationPrenom()" type="text" class="form-control " id="InputName" aria-describedby="emailHelp"
                     placeholder="Entrer votre prénom..." />
                     <div v-if="!validPrenom" class="form-text text-danger">Le prénom doit être renseigné</div>
                 </div>
-                <div class="mb-3">
+                <div class="mb-3 text-center">
                     <label for="InputPassword" class="form-label" >Mot de passe</label>
                     <input v-model="password" @change="validationPassword()" type="password" class="form-control " id="InputPassword"
                     placeholder="Entrer votre mot de passe" />
                     <div v-if="!validPassword" class="form-text text-danger">Le mot de passe n'est pas valide,
                          il doit comporter au moins 8 caractères dont un chiffre, des minuscules et majuscules</div>
                 </div>
-                <button v-if="toggle" :disabled="!validForm" type="submit" class="btn btn-secondary border-primary py-2 my-3 w-100" @click="login()">
+                <button v-if="$route.params.logorsign == 'login'" :disabled="!validForm" type="submit" class="btn btn-secondary border-primary py-2 my-3 w-100" @click="login()">
                     <span v-if="status == 'connecting...'">Connection en cours</span><span v-else>Se connecter</span>
                 </button>
-                <button v-else :disabled="!validForm" type="submit" class="btn btn-secondary border-primary py-2 my-3 w-100" @click="signup()">S'inscrire</button>
-                <p v-if="toggle" @click="switching()" class="my-4 pointer">Pas encore de compte ?</p>
-                <p v-else @click="switching()" class="my-4 pointer">Déjà enregistré ?</p>
+                <button v-if="$route.params.logorsign == 'signup'" :disabled="!validForm" type="submit" class="btn btn-secondary border-primary py-2 my-3 w-100" @click="signup()">S'inscrire</button>
+                <div class="text-center py-3">
+                    <router-link :to="{ name: 'Connexion', params:{logorsign: 'login'}}" v-if="$route.params.logorsign === 'signup'" class="text-dark w-100 mx-auto">Déjà enregistré ?</router-link>
+                    <router-link :to="{ name: 'Connexion', params:{logorsign: 'signup'}}" v-if="$route.params.logorsign === 'login'" class="text-dark w-100 mx-auto">Pas encore de compte ?</router-link>
+                </div>
             </form>
         </div>
     </div>
@@ -66,9 +68,6 @@ export default {
         ...mapState(['status'])
     },
     methods:{
-        switching(){
-            this.toggle = !this.toggle;
-        },
         validationEmail: function(){
             if(validator.validate(this.email)){this.validEmail = true;
             }else this.validEmail = false;
@@ -90,7 +89,7 @@ export default {
             this.$store.dispatch('login', {
             email: this.email,
             password: this.password})
-            .then(function (){console.log();self.$router.push('postfeed')})
+            .then(function (){console.log();self.$router.push('/postfeed')})
             .catch(function (error){console.log(error)})
         },
         signup(){

@@ -28,7 +28,7 @@ export default {
 
    beforeMount: function(){
     if(!this.$store.state.user.token && !localStorage.getItem('token')){
-      this.$router.push("/connexion")
+      this.$router.push({name:'Connexion', params:{logorsign: 'login'}})
       console.log("utilisateur non authentifié")
     }
     else if(!this.$store.state.user.token && localStorage.getItem('token')){

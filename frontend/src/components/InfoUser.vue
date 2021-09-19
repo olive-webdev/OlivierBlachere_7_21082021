@@ -222,7 +222,7 @@ export default {
         this.$store.state.user.userId = -1;
         localStorage.removeItem("userId");
         localStorage.removeItem("token");
-        this.$router.push("/connexion");
+        this.$router.push({name:'Connexion', params:{logorsign: 'signup'}});
         }
       })
       .catch((json) => console.log(json));

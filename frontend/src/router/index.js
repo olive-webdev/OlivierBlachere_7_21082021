@@ -11,7 +11,7 @@ const routes = [
     }
   },
   {
-    path: '/connexion',
+    path: '/connexion/:logorsign',
     name: 'Connexion',
     meta:{
       title: 'Connexion'

@@ -22,7 +22,7 @@
           </div>
         </div>
       </router-link>
-      <router-link @click="disconnect()" class="" to="/connexion">
+      <router-link @click="disconnect()" class="" :to="{name: 'Connexion', params:{logorsign: 'login'}}">
         <div class="d-flex justify-content-between align-items-center py-3" >
           <div class="me-auto px-3">
             <BIconBoxArrowRight class="fs-4 me-2"/>Se déconnecter
