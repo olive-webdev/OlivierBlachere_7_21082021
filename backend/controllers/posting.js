@@ -16,7 +16,9 @@ exports.getAllPostings = (req, res) => {
     models.Posting.findAll(
         {include: [
             {model: models.User},
-            {model: models.Comment, include:[models.Like, models.Report, models.User, {model: models.Comment, include:[models.User, models.Like, models.Report], order:[[models.Comment, 'createdAt', 'DESC']]}]},
+            {model: models.Comment, include:[models.Like, models.Report, models.User,
+                 {model: models.Comment, include:[models.User, models.Like, models.Report],
+                     order:[[models.Comment, 'createdAt', 'DESC']]}]},
             {model: models.Like, include:[models.User]},
             {model: models.Report, include:[models.User]}
         ], order:[['createdAt' , 'DESC'], [models.Comment, 'createdAt', 'ASC'],[models.Comment,models.Comment, 'createdAt', 'ASC']]}

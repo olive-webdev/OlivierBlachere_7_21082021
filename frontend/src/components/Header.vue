@@ -11,8 +11,10 @@
                 <p v-if="user.service !== null" class="mb-0">@ {{user.service}}</p>
               </div>
               <div class="thumbnail border border-primary rounded overflow-hidden">
-                <img v-if="user.Ppicture != null" :src="$store.state.user.Ppicture" height="60" width="60" alt="photo de profil" />
-                <img v-else class="rounded border" src="@/assets/defaultProfilPicture.jpeg" height="60" width="60" alt="photo de profil par défaut" />
+                <img v-if="user.Ppicture != null" 
+                :src="$store.state.user.Ppicture" height="60" width="60" alt="photo de profil" />
+                <img v-else class="rounded border" 
+                src="@/assets/defaultProfilPicture.jpeg" height="60" width="60" alt="photo de profil par défaut" />
               </div>
             </div>
         </div>

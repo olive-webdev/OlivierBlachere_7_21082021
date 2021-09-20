@@ -50,7 +50,13 @@ exports.login = (req, res) => {
                     if(result === true)
                         {res.status(200).json( //renvoie de l'ID utilisateur et du TOKEN
                             { userId: User.id, token: jwt.sign({userId: User.id}, process.env.TOKEN_PRIVATE_KEY, { expiresIn: "9h"}),
-                             name: User.name, surname: User.surname, email: User.email, service: User.service, Ppicture: User.Ppicture, admin: User.admin, creation: User.createdAt});}
+                             name: User.name, 
+                             surname: User.surname, 
+                             email: User.email, 
+                             service: User.service, 
+                             Ppicture: User.Ppicture, 
+                             admin: User.admin, 
+                             creation: User.createdAt});}
                     else{res.status(400).send("mauvais mot de passe")}
                 })
                 .catch(() => res.status(400).json({ error: 'connexion impossible' }))

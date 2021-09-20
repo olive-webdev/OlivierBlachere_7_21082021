@@ -1,5 +1,6 @@
 <template>
-  <div v-if="$store.state.user.userId != -1" class="bg-white d-flex justify-content-center border rounded">
+  <div v-if="$store.state.user.userId != -1" 
+  class="bg-white d-flex justify-content-center border rounded">
     <div id="navigation" class="p-0 my-0 w-100">
       <router-link class="" to="/postfeed">
         <div class="d-flex justify-content-between align-items-center py-3 rounded-top" >
@@ -18,7 +19,8 @@
       <router-link v-if="$store.state.user.admin == true" class="" to="/administration">
         <div class=" d-flex justify-content-between align-items-center py-3" >
           <div class="me-auto px-3">
-            <BIconTools class="fs-4 me-2"/>Administration<span v-if="$store.state.reports >0" class="ms-1 badge bg-secondary border border-primary text-end text-dark">{{$store.state.reports}}</span>
+            <BIconTools class="fs-4 me-2"/>Administration<span v-if="$store.state.reports >0" 
+              class="ms-1 badge bg-secondary border border-primary text-end text-dark">{{$store.state.reports}}</span>
           </div>
         </div>
       </router-link>

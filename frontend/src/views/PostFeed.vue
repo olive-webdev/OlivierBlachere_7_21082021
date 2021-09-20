@@ -10,25 +10,37 @@
         <div class="bg-white rounded d-flex flex-column px-md-4 py-md-3 mb-4 border">
           <form class="d-flex input-group">
             <div class="thumbnailMD">
-              <img v-if="$store.state.user.Ppicture" class="thumbnailMD border-end-0 border border-primary rounded-start" :src="$store.state.user.Ppicture"/>
-              <img v-else class="thumbnailMD border-end-0 border border-primary rounded-start p-1" src="@/assets/defaultProfilPicture.jpeg" alt="">
+              <img v-if="$store.state.user.Ppicture" 
+              class="thumbnailMD border-end-0 border border-primary rounded-start" 
+              :src="$store.state.user.Ppicture"/>
+              <img v-else 
+              class="thumbnailMD border-end-0 border border-primary rounded-start p-1" 
+              src="@/assets/defaultProfilPicture.jpeg" alt="">
             </div>
-            <div class="border-top border-bottom border-primary d-flex align-items-center px-md-3 ps-2"><BIconPencilFill class="fs-6"/></div>
-            <input v-model="text" type="text" class="form-control border-start-0 border-end-0 border-primary pe-0" aria-describedby="quoi de neuf"
+            <div class="border-top border-bottom border-primary d-flex align-items-center px-md-3 ps-2">
+              <BIconPencilFill class="fs-6"/>
+            </div>
+            <input v-model="text" type="text" 
+            class="form-control border-start-0 border-end-0 border-primary pe-0" 
+            aria-describedby="quoi de neuf"
             :placeholder="'Quoi de neuf ' + $store.state.user.name + ' ?'"/>
             <div class="border-top border-bottom border-primary d-flex align-items-center px-md-3">
-              <button @click="emoji = !emoji" class="fs-3 pointer mb-0 me-md-2 btn-none pe-0" type="button">&#128512; </button>
-              <button @click="loadPhoto()" class="fs-3 pointer mb-0 btn-none" type="button">&#127748; </button>
+              <button @click="emoji = !emoji" 
+              class="fs-3 pointer mb-0 me-md-2 btn-none pe-0" type="button">&#128512; </button>
+              <button @click="loadPhoto()" 
+              class="fs-3 pointer mb-0 btn-none" type="button">&#127748; </button>
             </div>
             <input @change="addPhoto()" type="file" id="addingPhoto" class="inputfile"/>
             <button @click.prevent="send()" type="submit"
-             class="btn btn-secondary border border-primary d-flex align-items-center border-start-0"><p class="d-none d-md-block mb-0">Envoyer !</p>
+             class="btn btn-secondary border border-primary d-flex align-items-center border-start-0">
+             <p class="d-none d-md-block mb-0">Envoyer !</p>
              <BIconArrowRightSquare class="fs-4 ms-md-2" />
             </button>
           </form>
           <div v-if="emoji" id="emoji">
             <div class="d-flex fs-3 mb-0 p-3 pb-0 flex-wrap justify-content-between">
-              <button @click="addEmoji(emojiList)" class="pointer btn-none" v-for="emojiList in emojiLists" :key="emojiList">{{emojiList}}</button>
+              <button @click="addEmoji(emojiList)" 
+              class="pointer btn-none" v-for="emojiList in emojiLists" :key="emojiList">{{emojiList}}</button>
             </div>
           </div>
           <div v-if="url" id="photo">
@@ -36,12 +48,16 @@
               <p class="ms-2 fs-4 mt-3 mb-0 text-start"> {{ text }}</p>
               <div class="position-relative">
                 <img v-if="url" :src="url" class="w-100 rounded mt-3 shadow">
-                <BIconTrash v-if="url" @click="deletePhoto()" class="fs-1 pointer trash position-absolute"/>
+                <BIconTrash v-if="url" @click="deletePhoto()" 
+                class="fs-1 pointer trash position-absolute"/>
               </div>
             </div>
             <div class="d-flex">
-              <button  @click="loadPhoto()" class="btn btn-secondary border-primary w-100 mt-3 me-4" for="addingPhoto">Modifier la photo</button>
-              <button @click="send()" class="btn btn-secondary border-primary w-100 mt-3" for="addingPhoto">Publier</button>
+              <button  @click="loadPhoto()" 
+              class="btn btn-secondary border-primary w-100 mt-3 me-4" 
+              for="addingPhoto">Modifier la photo</button>
+              <button @click="send()" 
+              class="btn btn-secondary border-primary w-100 mt-3" for="addingPhoto">Publier</button>
             </div>
           </div>
         </div>
@@ -56,29 +72,42 @@
                 </div>
                 <div class="me-auto ms-3 text-primary">
                   <h3 class="m-0 text-start">{{posting.User.name}} {{posting.User.surname}}</h3>
-                  <p @click="getSince()" class="text-start mb-0">publié le {{posting.createdAt.slice(8,10)}} {{posting.createdAt.slice(5,7)}} {{posting.createdAt.slice(0,4)}}</p>
+                  <p @click="getSince()" class="text-start mb-0">
+                    publié le {{posting.createdAt.slice(8,10)}} {{posting.createdAt.slice(5,7)}} {{posting.createdAt.slice(0,4)}}
+                  </p>
                 </div>
                 <div v-if="posting.Reports.length > 0"><BIconExclamationSquareFill class="text-danger fs-4 me-3"/></div>
                 <div class="dropdown">
-                  <button type="button" class="btn-none" data-bs-toggle="dropdown" aria-expanded="false"><BIconInfoSquare class="fs-4 text-danger"/></button>
+                  <button type="button" class="btn-none" data-bs-toggle="dropdown" aria-expanded="false">
+                    <BIconInfoSquare class="fs-4 text-danger"/>
+                  </button>
                   <ul id="menuPost" class="dropdown-menu" aria-labelledby="menuPost">
                     <li>
-                      <div v-if="$store.state.user.userId != posting.User.id && !$store.state.user.admin && posting.Reports.length == 0" class="p-2 ps-3 pointer text-dark" @click="report(posting, to[0])">Signaler</div>
+                      <div v-if="$store.state.user.userId != posting.User.id && !$store.state.user.admin && posting.Reports.length == 0" 
+                      class="p-2 ps-3 pointer text-dark" @click="report(posting, to[0])">Signaler</div>
                     </li>
                     <li>
-                      <div v-if="$store.state.user.userId != posting.User.id && !$store.state.user.admin && posting.Reports.length > 0" class="p-2 ps-3 pointer text-dark" @click="report(posting, to[0])">Annuler le signalement</div>
+                      <div v-if="$store.state.user.userId != posting.User.id && !$store.state.user.admin && posting.Reports.length > 0" 
+                        class="p-2 ps-3 pointer text-dark" @click="report(posting, to[0])">Annuler le signalement</div>
                     </li>
                     <li>
-                      <div v-if="$store.state.user.admin && posting.Reports.length > 0" class="p-2 ps-3 pointer" @click="deleteReport(posting, to[0])">Retirer le signalement</div>
+                      <div v-if="$store.state.user.admin && posting.Reports.length > 0" 
+                        class="p-2 ps-3 pointer" @click="deleteReport(posting, to[0])">Retirer le signalement</div>
                     </li>
                     <li>
-                      <div v-if="$store.state.user.userId == posting.User.id  || $store.state.user.admin" @click="modifyPost(posting)" class="p-2 ps-3 pointer">modifier</div>
+                      <div v-if="$store.state.user.userId == posting.User.id  || $store.state.user.admin" 
+                      @click="modifyPost(posting)" class="p-2 ps-3 pointer">modifier</div>
                     </li>
                     <li>
-                      <div v-if="$store.state.user.userId != posting.User.id" class="p-2 ps-3"><router-link class="text-decoration-none text-dark" :to="{ name: 'Profil', params: { id: posting.User.id }}">Voir le profil</router-link></div>
+                      <div v-if="$store.state.user.userId != posting.User.id" class="p-2 ps-3">
+                        <router-link class="text-decoration-none text-dark" :to="{ name: 'Profil', params: { id: posting.User.id }}">
+                          Voir le profil
+                        </router-link>
+                      </div>
                     </li>
                     <li>
-                      <div v-if="$store.state.user.userId == posting.User.id  || $store.state.user.admin" @click="deletePost(posting.id, posting.userId)" class="p-2 ps-3 pointer">Supprimer</div>
+                      <div v-if="$store.state.user.userId == posting.User.id  || $store.state.user.admin" 
+                      @click="deletePost(posting.id, posting.userId)" class="p-2 ps-3 pointer">Supprimer</div>
                     </li>
                   </ul>
                 </div>
@@ -86,42 +115,58 @@
 <!-- AFFICHAGE DU POST MODIFIÉ TEXTE ET IMAGE -->
               <div class="border-bottom border-secondary mb-3">
                 <p v-if="!posting.toggle" class="text-start fs-4 mb-0 mt-2">{{posting.text}}</p>
-                <input v-else class="form-control ps-2 w-100 py-2 my-3 rounded" type="text" name="modifyPost" id="textModified" :value="posting.text">
+                <input v-else 
+                class="form-control ps-2 w-100 py-2 my-3 rounded" type="text" name="modifyPost" id="textModified" :value="posting.text">
                 <div v-if="posting.image != null" class="position-relative">
-                    <img v-if="modifiedUrl != '' && posting.toggle" class="w-100 rounded my-3 shadow" :src="modifiedUrl" alt="" />
-                    <img v-if="modifiedUrl != '' && !posting.toggle" class="w-100 rounded my-3 shadow mb-2" :src="posting.image" alt="" />
-                    <img v-if="modifiedUrl == '' && !posting.imageDeleted && posting.toggle" class="w-100 rounded my-3 shadow mb-2" :src="posting.image" alt=""/>
-                    <img v-if="modifiedUrl == '' && !posting.imageDeleted && !posting.toggle" class="w-100 rounded my-3 shadow mb-2" :src="posting.image" alt=""/>
+                    <img v-if="modifiedUrl != '' && posting.toggle" 
+                    class="w-100 rounded my-3 shadow" :src="modifiedUrl" alt="" />
+                    <img v-if="modifiedUrl != '' && !posting.toggle" 
+                    class="w-100 rounded my-3 shadow mb-2" :src="posting.image" alt="" />
+                    <img v-if="modifiedUrl == '' && !posting.imageDeleted && posting.toggle" 
+                    class="w-100 rounded my-3 shadow mb-2" :src="posting.image" alt=""/>
+                    <img v-if="modifiedUrl == '' && !posting.imageDeleted && !posting.toggle" 
+                    class="w-100 rounded my-3 shadow mb-2" :src="posting.image" alt=""/>
                     <div v-if="modifiedUrl == '' && !posting.imageDeleted"></div>
-                    <BIconTrash v-if="modifiedUrl != '' && posting.toggle && posting.imageDeleted || posting.image && posting.toggle && !posting.imageDeleted" @click="deletePhoto(posting)" class="fs-1 pointer trash position-absolute"/>
+                    <BIconTrash v-if="modifiedUrl != '' && posting.toggle && posting.imageDeleted || posting.image && posting.toggle && !posting.imageDeleted" 
+                    @click="deletePhoto(posting)" class="fs-1 pointer trash position-absolute"/>
                 </div>
                 <div v-else-if="posting.image">
                   <img class="w-100 rounded my-3 shadow" :src="modifiedUrl" alt="" />
                 </div>
                 <div v-else class="position-relative">
                   <img v-if="modifiedUrl != '' && posting.toggle" class="w-100 rounded my-3 shadow" :src="modifiedUrl" alt="" />
-                  <BIconTrash v-if="modifiedUrl != '' && posting.toggle" @click="deletePhoto(posting)" class="fs-1 pointer trash position-absolute"/>
+                  <BIconTrash v-if="modifiedUrl != '' && posting.toggle" 
+                  @click="deletePhoto(posting)" class="fs-1 pointer trash position-absolute"/>
                 </div>
                 <div class="d-flex mb-3">
-                  <button v-if="posting.toggle && posting.image || posting.toggle && modifiedUrl != ''" @click="modifyPhoto(posting)" class="btn btn-secondary border-primary w-100 mt-2 me-4" for="modifyPhoto">Changer l'image</button>
-                  <button v-if="posting.toggle && !posting.image && modifiedUrl == ''" @click="modifyPhoto(posting)" class="btn btn-secondary border-primary w-100 mt-2 me-4" for="modifyPhoto">Ajouter une image</button>
-                  <button v-if="posting.toggle" @click="modifyPosting(posting)" class="btn btn-secondary border-primary w-100 mt-2" for="modifyPhoto">Publier</button>
+                  <button v-if="posting.toggle && posting.image || posting.toggle && modifiedUrl != ''" 
+                  @click="modifyPhoto(posting)" class="btn btn-secondary border-primary w-100 mt-2 me-4" for="modifyPhoto">Changer l'image</button>
+                  <button v-if="posting.toggle && !posting.image && modifiedUrl == ''" 
+                  @click="modifyPhoto(posting)" class="btn btn-secondary border-primary w-100 mt-2 me-4" for="modifyPhoto">Ajouter une image</button>
+                  <button v-if="posting.toggle" 
+                  @click="modifyPosting(posting)" class="btn btn-secondary border-primary w-100 mt-2" for="modifyPhoto">Publier</button>
                   <input @change="addModifiedPhoto(posting)" type="file" :id="posting.id" class="inputfile"/>
                 </div>
               </div>
 <!-- AFFICHAGE DES LIKES -->
               <div class="d-flex justify-content-between align-items-center text-dark">
-                <button class="btn-none" type="button" @click="like(posting, to[0])"><BIconHandThumbsUp class="fs-3 text-danger mb-2 pointer" /></button>
-                <div class="me-auto ms-2 d-flex align-items-center pointer likes position-relative fs-5"> {{ posting.Likes.length}}
+                <button class="btn-none" type="button" @click="like(posting, to[0])">
+                  <BIconHandThumbsUp class="fs-3 text-danger mb-2 pointer" />
+                </button>
+                <div class="me-auto ms-2 d-flex align-items-center pointer likes position-relative fs-5">
+                   {{ posting.Likes.length}}
                   <ul class="border">
-                    <li v-for="Like in posting.Likes" :key="Like.id" class="d-flex me-1"> {{ Like.User.name }} {{ Like.User.surname }} <span v-if="posting.Likes.length >1">,</span></li>
+                    <li v-for="Like in posting.Likes" :key="Like.id" 
+                    class="d-flex me-1"> {{ Like.User.name }} {{ Like.User.surname }} <span v-if="posting.Likes.length >1">,</span></li>
                     <li v-if="posting.Likes.length <2 && posting.Likes.length != 0">a liké ce post</li>
                     <li v-if="posting.Likes.length >1">ont liké ce post</li>
                     <li v-if="posting.Likes.length ==0">Personne n'a encore liké ce post</li>
                   </ul>
                 </div>     
                 <a class="text-decoration-none text-dark fs-5" data-bs-toggle="collapse" :href="'#collapse'+posting.id" role="button"
-                  aria-expanded="false" :aria-controls="'collapse'+posting.id">{{ posting.Comments.length }} commentaire<span v-if="posting.Comments.length >0">s</span>
+                  aria-expanded="false" :aria-controls="'collapse'+posting.id">
+                  {{ posting.Comments.length }} commentaire
+                  <span v-if="posting.Comments.length >0">s</span>
                 </a>
               </div>
 <!-- AFFICHAGE DES MESSAGES -->
@@ -129,14 +174,26 @@
                 <!-- BOUCLE POUR LES MESSAGES -->
                 <div v-for="comment in posting.Comments" :key="comment.createdAt">
                       <div  class="d-flex align-items-start" :id="'comment'+comment.id">
-                              <img v-if="comment.UserId == null" class="thumbnailSM rounded border border-primary me-2" src="@/assets/defaultProfilPicture.jpeg" alt="">
-                              <img v-else-if="comment.User.Ppicture == null" class="thumbnailSM rounded border border-primary me-2" src="@/assets/defaultProfilPicture.jpeg" alt="">
-                              <img v-else :src="comment.User.Ppicture" alt="" class="thumbnailSM rounded border border-primary me-2">
-                              <div :id="'commentText'+comment.id" class="message mb-2 text-start pb-1 pointer">
+                              <img v-if="comment.UserId == null" 
+                              class="thumbnailSM rounded border border-primary me-2" src="@/assets/defaultProfilPicture.jpeg" alt="">
+                              <img v-else-if="comment.User.Ppicture == null" 
+                              class="thumbnailSM rounded border border-primary me-2" src="@/assets/defaultProfilPicture.jpeg" alt="">
+                              <img v-else :src="comment.User.Ppicture" alt="" 
+                              class="thumbnailSM rounded border border-primary me-2">
+                              <div :id="'commentText'+comment.id" 
+                              class="message mb-2 text-start pb-1 pointer">
                                 <div class="">
-                                  <div v-if="comment.Reports.length > 0"><BIconExclamationSquareFill class="text-danger fs-6 me-3 mb-1"/></div>
-                                  <span v-if="comment.UserId == null"><strong>utilisateur supprimé : </strong>{{ comment.text }}</span>
-                                  <span v-else><strong>{{ comment.User.name }} {{ comment.User.surname }} :</strong>  {{ comment.text }}</span>
+                                  <div v-if="comment.Reports.length > 0">
+                                    <BIconExclamationSquareFill class="text-danger fs-6 me-3 mb-1"/>
+                                  </div>
+                                  <span v-if="comment.UserId == null">
+                                    <strong>utilisateur supprimé : </strong>
+                                    {{ comment.text }}
+                                  </span>
+                                  <span v-else>
+                                    <strong>{{ comment.User.name }} {{ comment.User.surname }} :</strong>
+                                      {{ comment.text }}
+                                  </span>
                                 </div>
                                 <!-- AFFICHAGE OPTIONS MESSAGE HOVER -->
                                 <div id="message" class="justify-content-end align-items-center border-top">
@@ -149,21 +206,34 @@
                                   <span v-else-if="comment.UserId == null || $store.state.user.userId != comment.User.id && $store.state.user.admin == false"
                                    class="ms-3 me-2" @click="report(comment, to[1])">signaler</span>
                                   <span @click="answerComment(comment, posting)" class="me-2">répondre</span>
-                                  <span v-if="comment.UserId == null || $store.state.user.userId == comment.User.id || $store.state.user.admin" @click="deleteComment(comment)">supprimer</span>
+                                  <span v-if="comment.UserId == null || $store.state.user.userId == comment.User.id || $store.state.user.admin" 
+                                  @click="deleteComment(comment)">supprimer</span>
                                 </div>
                               </div>
                       </div>
 <!-- BOUCLE POUR LES REPONSES DES MESSAGES -->
                       <div v-for="comment in comment.Comments" :key="comment.createdAt">
                         <div  class="d-flex align-items-start ms-5">
-                              <img v-if="comment.UserId == null" class="thumbnailSM rounded border border-primary me-2" src="@/assets/defaultProfilPicture.jpeg" alt="">
-                              <img v-else-if="comment.User.Ppicture == null" class="thumbnailSM rounded border border-primary me-2" src="@/assets/defaultProfilPicture.jpeg" alt="">
-                              <img v-else :src="comment.User.Ppicture" alt="" class="thumbnailSM rounded border border-primary me-2">
-                              <div :id="'comment'+comment.id" class="message mb-2 text-start pb-1 pointer">
+                              <img v-if="comment.UserId == null" 
+                              class="thumbnailSM rounded border border-primary me-2" src="@/assets/defaultProfilPicture.jpeg" alt="">
+                              <img v-else-if="comment.User.Ppicture == null" 
+                              class="thumbnailSM rounded border border-primary me-2" src="@/assets/defaultProfilPicture.jpeg" alt="">
+                              <img v-else :src="comment.User.Ppicture" alt="" 
+                              class="thumbnailSM rounded border border-primary me-2">
+                              <div :id="'comment'+comment.id" 
+                              class="message mb-2 text-start pb-1 pointer">
                                 <div class="d-flex">
-                                  <div v-if="comment.Reports.length > 0"><BIconExclamationSquareFill class="text-danger fs-6 me-3 mb-1"/></div>
-                                  <span v-if="comment.UserId == null"><strong>utilisateur supprimé : </strong>{{ comment.text }}</span>
-                                  <span v-else><strong>{{ comment.User.name }} {{ comment.User.surname }} :</strong>  {{ comment.text }}</span>
+                                  <div v-if="comment.Reports.length > 0">
+                                    <BIconExclamationSquareFill class="text-danger fs-6 me-3 mb-1"/>
+                                  </div>
+                                  <span v-if="comment.UserId == null">
+                                    <strong>utilisateur supprimé : </strong>
+                                    {{ comment.text }}
+                                  </span>
+                                  <span v-else>
+                                    <strong>{{ comment.User.name }} {{ comment.User.surname }} :</strong>
+                                      {{ comment.text }}
+                                  </span>
                                 </div>
                                 <!-- AFFICHAGE OPTIONS MESSAGE HOVER -->
                                 <div id="message" class="justify-content-end align-items-center border-top">
@@ -187,25 +257,34 @@
               <div id="sendingMessage" class="d-flex position-relative mt-3">
                 <form class="d-flex input-group position-relative">
                   <div class="thumbnailMD">
-                    <img v-if="$store.state.user.Ppicture" class="border-end-0 border border-primary rounded-start" :src="$store.state.user.Ppicture" height="50" width="50"/>
-                    <img v-else class="border-end-0 border border-primary rounded-start p-1" src="@/assets/defaultProfilPicture.jpeg" alt="" height="50" width="50">
+                    <img v-if="$store.state.user.Ppicture" 
+                    class="border-end-0 border border-primary rounded-start" :src="$store.state.user.Ppicture" height="50" width="50"/>
+                    <img v-else class="border-end-0 border border-primary rounded-start p-1" 
+                    src="@/assets/defaultProfilPicture.jpeg" alt="" height="50" width="50">
                   </div>
                   <div class="border-top border-bottom border-primary d-flex align-items-center px-md-3 ps-2">
                     <BIconPencilFill class="fs-6"/>
                   </div>
-                  <input :id="'textComment'+posting.id" type="text" class="form-control border-start-0 border-end-0 border-primary" placeholder="Écrivez un commentaire"/>
+                  <input :id="'textComment'+posting.id" type="text" 
+                  class="form-control border-start-0 border-end-0 border-primary" placeholder="Écrivez un commentaire"/>
                   <div class="border-top border-bottom border-primary d-flex align-items-center px-md-3 px-1">
-                    <button @click="emojiMessageToggle(posting)" class="fs-3 pointer mb-0 me-md-2 btn-none pe-1" type="button">&#128512; </button>
+                    <button @click="emojiMessageToggle(posting)" c
+                    lass="fs-3 pointer mb-0 me-md-2 btn-none pe-1" type="button">&#128512; 
+                    </button>
                   </div>
-                  <button v-if="answering" @click.prevent="sendAnswer(posting)" type="submit" class="btn btn-secondary border-primary d-flex align-items-center border-start-0">
+                  <button v-if="answering" @click.prevent="sendAnswer(posting)" type="submit" 
+                  class="btn btn-secondary border-primary d-flex align-items-center border-start-0">
                     Répondre !<BIconArrowRightSquare class="fs-4 ms-2" />
                   </button>
-                  <button v-else @click.prevent="sendComment(posting)" type="submit" class="btn btn-secondary border-primary d-flex align-items-center border-start-0">
-                    <p class="d-none d-md-block mb-0">Envoyer !</p><BIconArrowRightSquare class="fs-4 ms-md-2" />
+                  <button v-else @click.prevent="sendComment(posting)" type="submit" 
+                  class="btn btn-secondary border-primary d-flex align-items-center border-start-0">
+                    <p class="d-none d-md-block mb-0">Envoyer !</p>
+                    <BIconArrowRightSquare class="fs-4 ms-md-2" />
                   </button>
                   <div v-if="emojiMessage == posting.id" id="emojiMessage">
                     <div class="d-flex fs-3 mb-0 p-3 pb-0 flex-wrap justify-content-between">
-                      <button @click="addEmojiMessage(emojiList, posting)" class="btn-none pointer" v-for="emojiList in emojiLists" :key="emojiList">{{emojiList}}</button>
+                      <button @click="addEmojiMessage(emojiList, posting)" 
+                      class="btn-none pointer" v-for="emojiList in emojiLists" :key="emojiList">{{emojiList}}</button>
                     </div>
                   </div>
                 </form>
@@ -439,8 +518,6 @@ export default {
   display: flex;
 }
 img {
-  // width: 100%;
-  // height: 100%;
   object-fit: cover;
   object-position: center;
 }

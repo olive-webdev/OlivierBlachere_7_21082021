@@ -69,7 +69,13 @@ export default createStore({
     modifyProfil: ({commit}, userProfil) => {
       commit('setStatus', 'modifying Profil...')
       return new Promise((resolve, reject) => {
-        instance.put('/users/' + userProfil.id, {email: userProfil.email, surname: userProfil.surname, name: userProfil.name, service: userProfil.service, Ppicture: userProfil.photo, password: userProfil.password}, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
+        instance.put('/users/' + userProfil.id, 
+        {email: userProfil.email,
+           surname: userProfil.surname,
+            name: userProfil.name,
+             service: userProfil.service,
+              Ppicture: userProfil.photo,
+               password: userProfil.password}, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
         .then(function(response){commit('modifyProfil', userProfil);resolve(response)})
         .catch(function(error){commit('setStatus', 'errorModifyingProfil');reject(error)})
       })

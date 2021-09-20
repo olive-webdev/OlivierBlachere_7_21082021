@@ -35,7 +35,10 @@ exports.reportComment = (req, res) => {
 }
 
 exports.getAllReports = (req, res) => {
-    models.Report.findAll({include: [{model: models.User},{model: models.Posting, include:[models.User]},{model: models.Comment, include:[models.User]}] , order: [['createdAt', 'DESC']]})
+    models.Report.findAll({include: [{model: models.User}, 
+        {model: models.Posting, include:[models.User]}, 
+        {model: models.Comment, include:[models.User]}], 
+        order: [['createdAt', 'DESC']]})
     .then((Reports) => {res.status(200).json(Reports)})
     .catch((error) => res.status(500).json({ 'error': error }))
 }

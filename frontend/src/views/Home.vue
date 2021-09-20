@@ -7,15 +7,18 @@
           <h1 class="ms-3">Groupomania a désormais son réseau social</h1>
           <h2 class="text-center mt-3 mx-2">Partagez avec vos collègues !</h2>
           <div class="d-flex flex-column flex-lg-row align-items-center">
-            <img src="@/assets/screenshot.png" alt="photo d'écran du réseau social groupomania" class="shadow rounded m-5 mb-2 imageSize mx-3">
+            <img src="@/assets/screenshot.png" alt="photo d'écran du réseau social groupomania" 
+            class="shadow rounded m-5 mb-2 imageSize mx-3">
             <div class="d-flex flex-column m-lg-5 ms-0">
               <p class="my-3 fs-5 text-dark">Postez des messages, agrémentez en incluant des images</p>
               <p class="my-3 fs-5 text-dark">Commentez, likez les posts de vos collègues</p>
               <p class="my-3 fs-5 text-dark">Personnalisez votre profil, ajoutez une photo, précisez votre service</p>
               <p class="my-3 fs-5 text-dark">Inscrivez-vous simplement, votre nom, prénom, un email et un mot de passe suffisent.</p>
-              <router-link :to="{ name: 'Connexion', params:{logorsign: 'signup'}}" class="fs-4 btn btn-secondary border-primary mx-5 my-5">Inscrivez-vous !</router-link>
+              <router-link :to="{ name: 'Connexion', params:{logorsign: 'signup'}}" 
+              class="fs-4 btn btn-secondary border-primary mx-5 my-5">Inscrivez-vous !</router-link>
               <p class="my-3 fs-5 text-dark">Déjà inscrit ?</p>
-              <router-link :to="{ name: 'Connexion', params:{logorsign: 'login'}}" class="fs-4 btn btn-secondary border-primary mx-5 mt-5">Connectez-vous !</router-link>
+              <router-link :to="{ name: 'Connexion', params:{logorsign: 'login'}}" 
+              class="fs-4 btn btn-secondary border-primary mx-5 mt-5">Connectez-vous !</router-link>
             </div>
           </div>
         </div>
