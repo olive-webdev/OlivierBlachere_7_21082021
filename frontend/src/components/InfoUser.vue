@@ -200,7 +200,7 @@ export default {
         .then(() => this.getUserInfo())
         .catch((error) =>{console.log(error)})
         this.modifyToggle = !this.modifyToggle;
-        this.modal()}
+        this.modal(message)}
       else{
         this.$store.dispatch('modifyProfil', this.userProfil)
         .then(() => this.getUserInfo())

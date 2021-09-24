@@ -165,8 +165,7 @@
                 </div>     
                 <a class="text-decoration-none text-dark fs-5" data-bs-toggle="collapse" :href="'#collapse'+posting.id" role="button"
                   aria-expanded="false" :aria-controls="'collapse'+posting.id">
-                  {{ posting.Comments.length }} commentaire
-                  <span v-if="posting.Comments.length >0">s</span>
+                  {{ posting.Comments.length }} commentaire<span v-if="posting.Comments.length >0">s</span>
                 </a>
               </div>
 <!-- AFFICHAGE DES MESSAGES -->
@@ -268,8 +267,7 @@
                   <input :id="'textComment'+posting.id" type="text" 
                   class="form-control border-start-0 border-end-0 border-primary" placeholder="Écrivez un commentaire"/>
                   <div class="border-top border-bottom border-primary d-flex align-items-center px-md-3 px-1">
-                    <button @click="emojiMessageToggle(posting)" c
-                    lass="fs-3 pointer mb-0 me-md-2 btn-none pe-1" type="button">&#128512; 
+                    <button @click="emojiMessageToggle(posting)" class="fs-3 pointer mb-0 me-md-2 btn-none pe-1" type="button">&#128512; 
                     </button>
                   </div>
                   <button v-if="answering" @click.prevent="sendAnswer(posting)" type="submit" 

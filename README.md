@@ -84,10 +84,5 @@ npm run serve
 ```
 Le serveur se lance sur le port 8080, rendez-vous sur votre navigateur à l'adresse [suivante](http://localhost:8080)
 
-Vous pouvez vous connecter en tant qu'administrateur avec le login et mot de passe suivants
-
-login : mentor@openclassrooms.fr  
-mot de passe : password1A
-
-Où vous pouvez créer un ou même plusieurs comptes utilisateur pour tester l'application  
+Vous pouvez vous connecter en tant qu'administrateur avec le login et mot de passe fourni, où vous pouvez créer un ou même plusieurs comptes utilisateur pour tester l'application  
 En espérant que vous ayez une bonne expérience, sinon n'hésiter pas à me [contacter](mailto:olivier.blachere.dev@gmail.com)
