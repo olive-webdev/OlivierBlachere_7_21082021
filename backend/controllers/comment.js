@@ -1,5 +1,5 @@
 const models = require("../models/");
-const jwt = require('jsonwebtoken');
+const jwt    = require('jsonwebtoken');
 
 exports.createComment = (req, res) => {
     const text   = req.body.text;

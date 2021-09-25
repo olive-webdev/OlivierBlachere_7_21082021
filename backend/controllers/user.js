@@ -2,7 +2,7 @@ const bcrypt = require("bcrypt");
 const jwt    = require("jsonwebtoken");
 const models = require("../models/");
 const multer = require('../middleware/multer');
-const fs = require('fs');
+const fs     = require('fs');
 
 exports.signup = (req, res) => { // récupération des informations entrées par l'utilisateur
     const email    = req.body.email;
@@ -81,7 +81,7 @@ exports.getOneUser = (req, res) => { //renvoie les information d'un utilisateur
     .catch(() => res.status(500).json({ 'error': "pas d'utilisateur trouvé" }));
 };
 
-exports.modifyUser = (req, res) => {
+exports.modifyUser = (req, res) => { // modifie les informations d'un utilisateur
     const id = req.params.id;
     const token = req.headers.authorization.split(' ')[1];
     const decodedToken = jwt.verify(token, process.env.TOKEN_PRIVATE_KEY);
@@ -108,7 +108,7 @@ exports.modifyUser = (req, res) => {
     .catch((error) => console.log(error))
 };
 
-exports.modifyPhoto = (req, res) => {
+exports.modifyPhoto = (req, res) => { // modifie la photo d'un utilisateur
     const id = req.params.id;
     const token = req.headers.authorization.split(' ')[1];
     const decodedToken = jwt.verify(token, process.env.TOKEN_PRIVATE_KEY);
@@ -142,7 +142,7 @@ exports.modifyPhoto = (req, res) => {
     .catch(() => res.status(500).json({ 'error': "erreur lors du changement d'image"}))  
 };
 
-exports.deletePhoto = (req, res) => {
+exports.deletePhoto = (req, res) => { // supprime la photo d'un utilisateur
     const id = req.params.id;
     const token = req.headers.authorization.split(' ')[1];
     const decodedToken = jwt.verify(token, process.env.TOKEN_PRIVATE_KEY);
@@ -169,7 +169,8 @@ exports.deletePhoto = (req, res) => {
         })
     .catch(() => res.status(500).json({ 'error': "impossible de supprimer la photo"}))
 };
-exports.deleteUser = (req, res) => {
+
+exports.deleteUser = (req, res) => { // supprime le compte d'un utilisateur
     const id           = req.params.id;
     const token        = req.headers.authorization.split(' ')[1];
     const decodedToken = jwt.verify(token, process.env.TOKEN_PRIVATE_KEY);

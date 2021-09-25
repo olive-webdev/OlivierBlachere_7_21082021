@@ -1,6 +1,6 @@
 const models = require("../models/");
-const jwt = require('jsonwebtoken');
-const fs = require('fs');
+const jwt    = require('jsonwebtoken');
+const fs     = require('fs');
 
 exports.createPosting = (req, res) => {
     const text   = req.body.text;
