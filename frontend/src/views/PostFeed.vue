@@ -328,7 +328,7 @@ export default {
     }
   },
   methods:{
-    send(){
+    send(){ // ENVOIE LA PUBLICATION
       if(this.text == '' && document.getElementById('addingPhoto').value == ''){
         console.log('il faut remplir au moins le champs texte ou insérer une image')
       }
@@ -343,7 +343,7 @@ export default {
         .catch((error) =>{console.log(error)})
       }
     },
-    modifyPosting(posting){
+    modifyPosting(posting){ // MODIFIE LA PUBLICATION
       let formData = new FormData();
       if(posting.imageDeleted == undefined){posting.imageDeleted = false}
       if(posting.imageDeleted == true){this.image = 'deleted'}
@@ -355,12 +355,12 @@ export default {
       .then(()=>{this.getAllPost();this.emoji = false; this.photo = false; posting.imageDeleted = false})
       .catch((error) =>{console.log(error)})
     },
-    getAllPost(){
+    getAllPost(){ // RÉCUPÉRATION DE TOUTES LES PUBLICATIONS
       instance.get('/postings/', { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
       .then((response)=>{this.postings = response.data; this.comments = response.data.Comments})
       .catch((error) =>{console.log(error)})
     },
-    deletePost(id, user){
+    deletePost(id, user){ // SUPPRIME LA PUBLICATION
       instance.delete('/postings/by/' + user + "/" + id, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
       .then(()=>{this.getAllPost()})
       .catch((error) =>{console.log(error)})
@@ -371,7 +371,7 @@ export default {
     emojiMessageToggle(posting){
       this.emojiMessage == posting.id ? this.emojiMessage = !posting.id : this.emojiMessage = posting.id
     },
-    addEmojiMessage(emoji, posting){
+    addEmojiMessage(emoji, posting){ // AJOUTE L'EMOJI AU TEXTE
       document.getElementById('textComment'+posting.id).value = document.getElementById('textComment'+posting.id).value.concat(' ', emoji); this.emojiMessage = false;
     },
     loadPhoto(){
@@ -383,16 +383,16 @@ export default {
       let fileEl = document.getElementById(posting.id);
       fileEl.click()
     },
-    addPhoto(){
+    addPhoto(){ // PREVIEW DE LA PHOTO À PUBLIER
       const photoPreview = document.getElementById('addingPhoto').files[0];
       this.url = URL.createObjectURL(photoPreview);
     },
-    addModifiedPhoto(posting){
+    addModifiedPhoto(posting){ // MODIFIE LA PHOTO DE LA PUBLICATION
       let photoToChange = document.getElementById(posting.id).files[0]
       this.modifiedUrl = URL.createObjectURL(photoToChange);
       posting.imageDeleted = false
     },
-    deletePhoto(posting){
+    deletePhoto(posting){ // SUPPRIME LA PHOTO DE LA PUBLICATION
       this.url = '';
       this.modifiedUrl= '',
       posting.imageDeleted = true
@@ -402,22 +402,22 @@ export default {
     modifyPost(posting){
       posting.toggle = !posting.toggle
     },
-    like(from, to){
+    like(from, to){ // AJOUTE (OU SUPPRIME) UN LIKE À LA PUBLICATION OU AU MESSAGE
       instance.post('/likes/'+to+'/'+from.id, {userId :localStorage.getItem('userId')}, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
       .then(() => this.getAllPost())
       .catch((error) =>{console.log(error)})
     },
-    report(from, to){
+    report(from, to){ // AJOUTE UN SIGNALEMENT À LA PUBLICATION OU AU MESSAGE
       instance.post('/reports/'+to+'/'+from.id, {userId :localStorage.getItem('userId')}, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
       .then(() => this.getAllPost())
       .catch((error) =>{console.log(error)})
     },
-    deleteReport(from, to){
+    deleteReport(from, to){ // SUPPRIME UN SIGNALEMENT À LA PUBLICATION OU AU MESSAGE
       instance.delete('/reports/'+to+'/'+from.id, { headers: { Authorization: 'bearer ' + localStorage.getItem('token')}})
       .then(() => {this.$store.commit('deleteReport');this.getAllPost()})
       .catch((error) =>{console.log(error)})
     },
-    sendComment(posting){
+    sendComment(posting){ // POST UN COMMENTAIRE À UNE PUBLICATION
       if(document.getElementById('textComment'+posting.id).value != ''){
         instance.post('/comments/',
         {text: document.getElementById('textComment'+posting.id).value, userId: localStorage.getItem('userId'), postingId: posting.id},
@@ -432,12 +432,12 @@ export default {
         return;
       }
     },
-    deleteComment(comment){
+    deleteComment(comment){ // SUPPRIME UN COMMENTAIRE
       instance.delete('/comments/by/'+comment.UserId+'/'+comment.id, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
       .then(()=>{this.getAllPost()})
       .catch((error) =>{console.log(error)})
     },
-    answerComment(comment, posting){
+    answerComment(comment, posting){ // CHANGEMENT APPARENCE LORS DE LA RÉPONSE À UN COMMENTAIRE
         document.getElementById('commentText'+comment.id).classList.replace('message', 'selectedMessageToAnswer');
         let form = document.getElementById('sendingMessage');
         let textComment = document.getElementById('textComment'+posting.id);
@@ -449,7 +449,7 @@ export default {
           this.answering = false;
         })
     },
-    sendAnswer(posting){
+    sendAnswer(posting){ // POST UN COMMENTAIRE À UN COMMENTAIRE
       if(document.getElementById('textComment'+posting.id).value != ''){
         instance.post('/comments/',
         {text: document.getElementById('textComment'+posting.id).value, userId: localStorage.getItem('userId'),commentId: this.answeringId},
@@ -468,7 +468,7 @@ export default {
       }
     },
   },
-  beforeMount: function() {
+  beforeMount: function() { // VÉRIFIE SI L'UTILISATEUR EST BIEN AUTHENTIFIÉ
     if (!this.$store.state.user.token && !localStorage.getItem("token")) {
       this.$store.state.user.userId = -1;
       this.$router.push({name:'Connexion', params:{logorsign: 'login'}});

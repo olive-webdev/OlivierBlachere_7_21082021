@@ -50,23 +50,23 @@ export default {
       }
   },
   methods:{
-    getReports(){
+    getReports(){ // RÉCUPÉRATION DES SIGNALEMENTS
       this.$store.dispatch('reports')
       .then(function (){console.log('récuprération des signalements')})
       .catch(function (error){console.log(error)})
     },
-    getAllReports(){
+    getAllReports(){ // SERT POUR AFFICHER LA PASTILLE INDIQUANT LE NOMBRE DE SIGNALEMENT DANS LE MENU
         instance.get('/reports/', { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
         .then((response)=>{this.reports = response.data})
         .catch((error) =>{console.log(error)})
     },
-    closeAlert(from, to){
+    closeAlert(from, to){ // SUPPRIME LE SIGNALEMENT
     instance.delete('/reports/'+to+'/'+from.id, { headers: { Authorization: 'bearer ' + localStorage.getItem('token')}})
     .then(() => {console.log('signalement supprimé');this.getReports();this.getAllReports()})
     .catch((error) =>{console.log(error)})
     },
   },
-  beforeMount: function() {
+  beforeMount: function() { // VÉRIFIE SI L'UTILISATEUR EST BIEN AUTHENTIFIÉ
   if (!this.$store.state.user.token && !localStorage.getItem("token")) {
     this.$router.push({name:'Connexion', params:{logorsign: 'login'}});
     console.log("utilisateur non authentifié");

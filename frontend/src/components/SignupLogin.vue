@@ -78,7 +78,7 @@ export default {
         }
     },
     computed:{
-        validForm: function(){
+        validForm: function(){ // VALIDATION DE L'EMAIL ET DU MOT DE PASSE
             if(this.$route.params.logorsign == 'login' 
             && validator.validate(this.email) 
             && schema.validate(this.password)){return true;}
@@ -108,7 +108,7 @@ export default {
             if(this.prenom.length > 2 ){this.validPrenom = true;
             }else this.validPrenom = false;
         },
-        login(){
+        login(){ // LOG L'UTILISATEUR
             const self = this;
             this.$store.dispatch('login', {
             email: this.email,
@@ -116,7 +116,7 @@ export default {
             .then(function (){console.log();self.$router.push('/postfeed')})
             .catch(function (error){console.log(error)})
         },
-        signup(){
+        signup(){ // CRÉÉ UN COMPTE UTILISATEUR
             const self = this;
             this.$store.dispatch('signup', {
             email: this.email,

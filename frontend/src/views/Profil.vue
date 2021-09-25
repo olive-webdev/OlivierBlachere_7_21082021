@@ -26,7 +26,7 @@ export default {
     }
   },
 
-   beforeMount: function(){
+   beforeMount: function(){ // VÉRIFIE SI L'UTILISATEUR EST BIEN AUTHENTIFIÉ
     if(!this.$store.state.user.token && !localStorage.getItem('token')){
       this.$router.push({name:'Connexion', params:{logorsign: 'login'}})
       console.log("utilisateur non authentifié")

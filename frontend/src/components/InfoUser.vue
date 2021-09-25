@@ -1,4 +1,4 @@
-<template>
+    <template>
   <div v-if="userProfil.id != null" class="bg-white d-flex pt-3 flex-column p-3 border rounded">
     <div class="d-flex flex-column">
       <div class="d-flex flex-column flex-lg-row align-items-center">
@@ -93,7 +93,7 @@
           Supprimer le compte
         </button>
       </div >
-
+<!-- MODIFY PASSWORD -->
       <form v-if="passwordToggle == true" class="mt-4 w-50 align-self-center">
         <div class="my-3">
           <label for="Password" class="form-label">Entrer votre nouveau mot de passe</label>
@@ -116,6 +116,7 @@
           Changer le mot de passe
         </button>
       </form>
+<!-- DELETE ACCOUNT -->
       <div v-if="deleteToggle" class="mt-5 d-flex flex-column">
         <p class="fs-4">La suppression du compte est définitive et irréversible.</p>
         <button type="button" @click="deleteAccount()" 
@@ -168,7 +169,7 @@ export default {
     };
   },
   methods:{
-    getUserInfo(){
+    getUserInfo(){ //RÉCUPÉRATION DES INFOS UTILISATEURS
         instance.get("/users/" + this.userProfilId, { headers: { Authorization: 'bearer ' + this.token}})
         .then((res) => {
             this.userProfil = { admin: res.data.admin, id: res.data.id, surname: res.data.surname,
@@ -187,7 +188,7 @@ export default {
     deleteAccount(){
       this.deleteToggle = !this.deleteToggle
     },
-    saveNewProfil(){
+    saveNewProfil(){ // SAUVEGARDE DU PROFIL MODIFIÉ
        let message = "✅ Profil modifié avec succès"
       if(this.userProfilId != this.user && this.$store.state.user.admin == true){
         instance.put('/users/' + this.userProfil.id, 
@@ -208,7 +209,7 @@ export default {
         this.modifyToggle = !this.modifyToggle;
         this.modal(message)}
     },
-    saveNewPassword(){
+    saveNewPassword(){ // SAUVEGARDE DU NOUVEAU MOT DE PASSE
       if((schema.validate(this.newPassword) && this.newPassword == this.newPasswordVerif) 
       && (this.userProfilId == this.user || this.$store.state.user.admin == true)){
         instance.put('/users/' + this.userProfil.id, {password: this.newPassword}, { headers: { Authorization: 'bearer ' + localStorage.getItem('token') } })
@@ -230,7 +231,7 @@ export default {
       let fileEl = document.getElementById("modifyPhoto");
       fileEl.click()
     },
-    addPhoto(){
+    addPhoto(){ // SAUVEGARDE DE LA NOUVELLE PHOTO DE PROFIL
       this.userProfil.Ppicture = this.$refs.Ppicture.files[0];
       let formData = new FormData();
       formData.append('image', this.userProfil.Ppicture)
@@ -247,7 +248,7 @@ export default {
       })
       .catch((json) => console.log(json));
     },
-    deletePhoto(){
+    deletePhoto(){ // SUPPRESSION DE LA PHOTO DE PROFIL
       if(this.userProfil.Ppicture){
         instance.delete("/users/" + this.userProfil.id + "/photo", { headers: {  Authorization: 'bearer ' + localStorage.getItem('token') }})
         .then(() => {
@@ -263,7 +264,7 @@ export default {
       }
       
     },
-    deletingAccount(){
+    deletingAccount(){ // SUPPRESSION DU COMPTE
       instance.delete("/users/" + this.userProfil.id,{ headers: {  Authorization: 'bearer ' + localStorage.getItem('token') }})
       .then(() => {
         if(this.$store.state.user.admin == true){
