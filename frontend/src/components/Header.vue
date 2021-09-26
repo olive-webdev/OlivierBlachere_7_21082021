@@ -8,7 +8,7 @@
             <div @click="menu = !menu" class="d-flex pointer">
               <div class="me-3 text-end text-dark fs-5 d-none d-md-block">
                 <h3 class="m-0">{{user.name}} {{user.surname}}</h3>
-                <p v-if="user.service !== null" class="mb-0 fw-bold">@ {{user.service}}</p>
+                <p v-if="user.service !== null" class="mb-0">@ {{user.service}}</p>
               </div>
               <button class="thumbnail border border-primary rounded overflow-hidden px-0" aria-label="menu">
                 <img v-if="user.Ppicture != null" 
