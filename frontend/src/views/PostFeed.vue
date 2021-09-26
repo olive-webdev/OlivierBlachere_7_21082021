@@ -11,6 +11,7 @@
           <form class="d-flex input-group">
             <div class="thumbnailMD">
               <img v-if="$store.state.user.Ppicture" 
+              alt="photo de profil"
               class="thumbnailMD border-end-0 border border-primary rounded-start" 
               :src="$store.state.user.Ppicture"/>
               <img v-else 
@@ -25,13 +26,13 @@
             aria-describedby="quoi de neuf"
             :placeholder="'Quoi de neuf ' + $store.state.user.name + ' ?'"/>
             <div class="border-top border-bottom border-primary d-flex align-items-center px-md-3">
-              <button @click="emoji = !emoji" 
+              <button @click="emoji = !emoji" aria-label="ajouter un emoji"
               class="fs-3 pointer mb-0 me-md-2 btn-none pe-0" type="button">&#128512; </button>
-              <button @click="loadPhoto()" 
+              <button @click="loadPhoto()" aria-label="ajouter une photo"
               class="fs-3 pointer mb-0 btn-none" type="button">&#127748; </button>
             </div>
             <input @change="addPhoto()" type="file" id="addingPhoto" class="inputfile"/>
-            <button @click.prevent="send()" type="submit"
+            <button @click.prevent="send()" type="submit" aria-label="envoyer"
              class="btn btn-secondary border border-primary d-flex align-items-center border-start-0">
              <p class="d-none d-md-block mb-0">Envoyer !</p>
              <BIconArrowRightSquare class="fs-4 ms-md-2" />
@@ -39,7 +40,7 @@
           </form>
           <div v-if="emoji" id="emoji">
             <div class="d-flex fs-3 mb-0 p-3 pb-0 flex-wrap justify-content-between">
-              <button @click="addEmoji(emojiList)" 
+              <button @click="addEmoji(emojiList)" aria-label="ajouter un emoji"
               class="pointer btn-none" v-for="emojiList in emojiLists" :key="emojiList">{{emojiList}}</button>
             </div>
           </div>
@@ -67,21 +68,21 @@
             <div class="bg-white rounded d-flex pt-3 flex-column p-md-4 p-2 mb-4  border">
               <div class="d-flex justify-content-between border-bottom border-secondary pb-2">
                 <div class="rounded border border-primary overflow-hidden thumbnail rounded">
-                  <img v-if="posting.User.Ppicture" class="thumbnail" :src="posting.User.Ppicture" />
-                  <img v-else class="thumbnail" src="@/assets/defaultProfilPicture.jpeg"/>
+                  <img v-if="posting.User.Ppicture" class="thumbnail" :src="posting.User.Ppicture" alt="photo de profil"/>
+                  <img v-else class="thumbnail" src="@/assets/defaultProfilPicture.jpeg" alt="photo de profil"/>
                 </div>
-                <div class="me-auto ms-3 text-primary">
+                <div class="me-auto ms-3 text-dark">
                   <h3 class="m-0 text-start">{{posting.User.name}} {{posting.User.surname}}</h3>
-                  <p @click="getSince()" class="text-start mb-0">
+                  <p @click="getSince()" class="text-start mb-0 text-dark">
                     publié le {{posting.createdAt.slice(8,10)}} {{posting.createdAt.slice(5,7)}} {{posting.createdAt.slice(0,4)}}
                   </p>
                 </div>
                 <div v-if="posting.Reports.length > 0"><BIconExclamationSquareFill class="text-danger fs-4 me-3"/></div>
                 <div class="dropdown">
-                  <button type="button" class="btn-none" data-bs-toggle="dropdown" aria-expanded="false">
+                  <button type="button" class="btn-none" data-bs-toggle="dropdown" aria-expanded="false" aria-label="plus d'info">
                     <BIconInfoSquare class="fs-4 text-danger"/>
                   </button>
-                  <ul id="menuPost" class="dropdown-menu" aria-labelledby="menuPost">
+                  <ul id="menuPost" class="dropdown-menu" aria-labelledby="menu de la publication">
                     <li>
                       <div v-if="$store.state.user.userId != posting.User.id && !$store.state.user.admin && posting.Reports.length == 0" 
                       class="p-2 ps-3 pointer text-dark" @click="report(posting, to[0])">Signaler</div>
@@ -150,7 +151,7 @@
               </div>
 <!-- AFFICHAGE DES LIKES -->
               <div class="d-flex justify-content-between align-items-center text-dark">
-                <button class="btn-none" type="button" @click="like(posting, to[0])">
+                <button class="btn-none" type="button" @click="like(posting, to[0])" aria-label="ajouter un like">
                   <BIconHandThumbsUp class="fs-3 text-danger mb-2 pointer" />
                 </button>
                 <div class="me-auto ms-2 d-flex align-items-center pointer likes position-relative fs-5">
@@ -174,9 +175,9 @@
                 <div v-for="comment in posting.Comments" :key="comment.createdAt">
                       <div  class="d-flex align-items-start" :id="'comment'+comment.id">
                               <img v-if="comment.UserId == null" 
-                              class="thumbnailSM rounded border border-primary me-2" src="@/assets/defaultProfilPicture.jpeg" alt="">
+                              class="thumbnailSM rounded border border-primary me-2" src="@/assets/defaultProfilPicture.jpeg" alt="photo de profil">
                               <img v-else-if="comment.User.Ppicture == null" 
-                              class="thumbnailSM rounded border border-primary me-2" src="@/assets/defaultProfilPicture.jpeg" alt="">
+                              class="thumbnailSM rounded border border-primary me-2" src="@/assets/defaultProfilPicture.jpeg" alt="photo de profil">
                               <img v-else :src="comment.User.Ppicture" alt="" 
                               class="thumbnailSM rounded border border-primary me-2">
                               <div :id="'commentText'+comment.id" 
@@ -214,9 +215,9 @@
                       <div v-for="comment in comment.Comments" :key="comment.createdAt">
                         <div  class="d-flex align-items-start ms-5">
                               <img v-if="comment.UserId == null" 
-                              class="thumbnailSM rounded border border-primary me-2" src="@/assets/defaultProfilPicture.jpeg" alt="">
+                              class="thumbnailSM rounded border border-primary me-2" src="@/assets/defaultProfilPicture.jpeg" alt="photo de profil">
                               <img v-else-if="comment.User.Ppicture == null" 
-                              class="thumbnailSM rounded border border-primary me-2" src="@/assets/defaultProfilPicture.jpeg" alt="">
+                              class="thumbnailSM rounded border border-primary me-2" src="@/assets/defaultProfilPicture.jpeg" alt="photo de profil">
                               <img v-else :src="comment.User.Ppicture" alt="" 
                               class="thumbnailSM rounded border border-primary me-2">
                               <div :id="'comment'+comment.id" 
@@ -257,9 +258,10 @@
                 <form class="d-flex input-group position-relative">
                   <div class="thumbnailMD">
                     <img v-if="$store.state.user.Ppicture" 
-                    class="border-end-0 border border-primary rounded-start" :src="$store.state.user.Ppicture" height="50" width="50"/>
+                    class="border-end-0 border border-primary rounded-start" :src="$store.state.user.Ppicture"
+                     height="50" width="50" alt="photo de profil"/>
                     <img v-else class="border-end-0 border border-primary rounded-start p-1" 
-                    src="@/assets/defaultProfilPicture.jpeg" alt="" height="50" width="50">
+                    src="@/assets/defaultProfilPicture.jpeg" alt="photo de profil" height="50" width="50">
                   </div>
                   <div class="border-top border-bottom border-primary d-flex align-items-center px-md-3 ps-2">
                     <BIconPencilFill class="fs-6"/>
@@ -267,21 +269,22 @@
                   <input :id="'textComment'+posting.id" type="text" 
                   class="form-control border-start-0 border-end-0 border-primary" placeholder="Écrivez un commentaire"/>
                   <div class="border-top border-bottom border-primary d-flex align-items-center px-md-3 px-1">
-                    <button @click="emojiMessageToggle(posting)" class="fs-3 pointer mb-0 me-md-2 btn-none pe-1" type="button">&#128512; 
+                    <button @click="emojiMessageToggle(posting)" class="fs-3 pointer mb-0 me-md-2 btn-none pe-1" aria-label="ajouter un emoji"
+                     type="button">&#128512;
                     </button>
                   </div>
-                  <button v-if="answering" @click.prevent="sendAnswer(posting)" type="submit" 
+                  <button v-if="answering" @click.prevent="sendAnswer(posting)" type="submit" aria-label="répondre"
                   class="btn btn-secondary border-primary d-flex align-items-center border-start-0">
                     Répondre !<BIconArrowRightSquare class="fs-4 ms-2" />
                   </button>
-                  <button v-else @click.prevent="sendComment(posting)" type="submit" 
+                  <button v-else @click.prevent="sendComment(posting)" type="submit" aria-label="envoyer"
                   class="btn btn-secondary border-primary d-flex align-items-center border-start-0">
                     <p class="d-none d-md-block mb-0">Envoyer !</p>
                     <BIconArrowRightSquare class="fs-4 ms-md-2" />
                   </button>
                   <div v-if="emojiMessage == posting.id" id="emojiMessage">
                     <div class="d-flex fs-3 mb-0 p-3 pb-0 flex-wrap justify-content-between">
-                      <button @click="addEmojiMessage(emojiList, posting)" 
+                      <button @click="addEmojiMessage(emojiList, posting)" aria-label="ajouter un emoji"
                       class="btn-none pointer" v-for="emojiList in emojiLists" :key="emojiList">{{emojiList}}</button>
                     </div>
                   </div>

@@ -132,7 +132,7 @@
       <div class="fs-4 px-3 py-3 border border-primary rounded bg-light position-relative size text-wrap">
         {{userMessageText}}
         <button @click="userMessage = !userMessage" type="button" 
-        class="btn-close fs-6 position-absolute close" aria-label="Close"></button>
+        class="btn-close fs-6 position-absolute close" aria-label="fermer"></button>
       </div>
     </div>
     </transition>
