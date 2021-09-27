@@ -67,8 +67,8 @@
           <li v-for="posting in postings" :key="posting.id" :id='"post"+posting.id'>
             <div class="bg-white rounded d-flex pt-3 flex-column p-md-4 p-2 mb-4  border">
               <div class="d-flex justify-content-between border-bottom border-secondary pb-2">
-                <div class="rounded border border-primary overflow-hidden thumbnail rounded">
-                  <img v-if="posting.User.Ppicture" class="thumbnail" :src="posting.User.Ppicture" alt="photo de profil"/>
+                <div class="rounded border border-primary overflow-hidden thumbnail rounded flex-shrink-0">
+                  <img v-if="posting.User.Ppicture" class="thumbnail" :src="posting.User.Ppicture" alt="photo de profil" width="60"/>
                   <img v-else class="thumbnail" src="@/assets/defaultProfilPicture.jpeg" alt="photo de profil"/>
                 </div>
                 <div class="me-auto ms-3 text-dark">

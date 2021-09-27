@@ -10,7 +10,7 @@
                 <h3 class="m-0">{{user.name}} {{user.surname}}</h3>
                 <p v-if="user.service !== null" class="mb-0">@ {{user.service}}</p>
               </div>
-              <button class="thumbnail border border-primary rounded overflow-hidden px-0" aria-label="menu">
+              <button class="thumbnail border border-primary rounded overflow-hidden p-0" aria-label="menu">
                 <img v-if="user.Ppicture != null" 
                 :src="$store.state.user.Ppicture" height="60" width="60" alt="photo de profil" />
                 <img v-else class="rounded border" 
